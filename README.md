@@ -1,2 +1,2 @@
-# BT3DModelStore
-Магазин на Asp Net Core
+# Магазин 3d моделей на Net
+Мой дипломный pet проект

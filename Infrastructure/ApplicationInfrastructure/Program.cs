@@ -31,8 +31,8 @@ namespace ApplicationInfrastructure
                 opt.ClientId = builder.Configuration["GoogleOAuth2.0:ClientId"]!;
                 opt.ClientSecret = builder.Configuration["GoogleOAuth2.0:ClientSecret"]!;
             });
-            builder.Services.AddDbContext<SignInDbContext>(opt => opt.UseSqlServer(@"Server=WIN-Q0NS67721NA\SQLEXPRESS;Database=ApplicationSignInManager;Trusted_Connection=True;TrustServerCertificate=True;"));
-            builder.Services.AddIdentity<User, IdentityRole>(opt => opt.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<SignInDbContext>();
+            builder.Services.AddDbContext<MainClientDbContext>(opt => opt.UseSqlServer(@"Server=WIN-Q0NS67721NA\SQLEXPRESS;Database=ApplicationSignInManager;Trusted_Connection=True;TrustServerCertificate=True;"));
+            builder.Services.AddIdentity<User, IdentityRole>(opt => opt.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<MainClientDbContext>();
             builder.Services.ConfigureApplicationCookie(opt =>
             {
                 opt.LoginPath = "/Account/Login";

@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using DomainModel;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebClient.DbContexts
 {
-    public class SignInDbContext : IdentityDbContext
+    public class MainClientDbContext : IdentityDbContext
     {
-        public SignInDbContext(DbContextOptions opt) : base(opt)
+        public MainClientDbContext(DbContextOptions opt) : base(opt)
         {
             if (!Database.EnsureCreated())
             {

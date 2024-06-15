@@ -7,21 +7,9 @@ namespace WebServer.AppDbContexts
 {
     public class MainDbContext : IdentityDbContext<User>
     {
+        public DbSet<Product> Products => Set<Product>();
         public MainDbContext(DbContextOptions<MainDbContext> opt) : base(opt)
         {
-            //if(!Database.EnsureCreated())
-            //{
-            //    Database.EnsureCreated();
-            //}
-            //else
-            //{
-            //    Database.EnsureDeleted();
-            //    Database.EnsureCreated();
-            //}
-            //if (!Database.EnsureCreated())
-            //{
-            //    Database.EnsureCreated();
-            //}
             Database.EnsureDeleted();
             Database.EnsureCreated();
             

@@ -1,0 +1,47 @@
+﻿form input {
+    display: block;
+    font-size: 20px;
+    border-color: white;
+    border-radius: 10px;
+}
+
+form button {
+    display: block;
+    font-size: 30px;
+    margin: 20px;
+    border-color: white;
+    border-radius: 10px;
+}
+
+button {
+    background: rgb(238,174,235);
+    background: radial-gradient(circle, rgba(238,174,235,1) 26%, rgba(96,129,226,1) 95%);
+}
+
+    button:hover {
+        background: rgb(242, 230, 242);
+        background: radial-gradient(circle, rgba(242, 230, 242,1) 26%, rgba(96,129,226,1) 95%);
+    }
+
+label {
+    font-size: 30px;
+}
+
+.main {
+    background-color: rgb(237, 218, 240);
+    margin-top: 10%;
+    border: solid;
+    width: 40%;
+    height: 30em;
+    margin-left: 30%;
+    border-radius: 10px;
+}
+
+.cont {
+    padding-left: 30%;
+}
+
+body {
+    background: rgb(23,22,61);
+    background: linear-gradient(120deg, rgba(23,22,61,1) 44%, rgba(106,32,43,1) 76%);
+}

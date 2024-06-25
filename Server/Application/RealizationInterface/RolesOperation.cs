@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace WebServer.RealizationInterface
 {
-    public class AdminOperation : IRoleOperation
+    public class RolesOperation : IRoleOperation
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         
         private readonly ILogger _logger;
-        public AdminOperation(RoleManager<IdentityRole> rolemanager, ILogger logger)
+        public RolesOperation(RoleManager<IdentityRole> rolemanager, ILogger logger)
         {
             _roleManager = rolemanager;
             _logger = logger;

@@ -19,9 +19,9 @@ namespace Application.RealizationInterface
             _yandexClient = yandexcloudoperation;
             _configuration = configuration;
         }
-        public async Task<string> CreateProductAsync(Product product, Stream model, string nameofobjectinstorage, string? pathfromstorage = null)
+        public async Task<string> CreateProductAsync(Product product, Stream model, string nameofobjectinstorage)
         {
-            var res = await _yandexClient.AddModel(model, pathfromstorage ?? _configuration["PathFromStorage"]!, nameofobjectinstorage);
+            var res = await _yandexClient.AddModel(model,  _configuration["PathFromStorage"]!, nameofobjectinstorage);
             if (!res.isCorrect) throw new Exception();
             product.Url = res.resultUrlFromModel!;
             _database.Products.Add(product);
@@ -29,9 +29,9 @@ namespace Application.RealizationInterface
             return res.resultUrlFromModel!;
         }
 
-        public async Task<bool> DeleteProductAsync(Product product, string nameofobjectinstorage, string? pathfromstorage = null)
+        public async Task<bool> DeleteProductAsync(Product product, string nameofobjectinstorage)
         {
-            var res = await _yandexClient.DeleteModel(pathfromstorage ?? _configuration["PathFromStorage"]!, nameofobjectinstorage);
+            var res = await _yandexClient.DeleteModel(_configuration["PathFromStorage"]!, nameofobjectinstorage);
             if (res) throw new Exception();
             var prod = _database.Products.Where(p =>
             p.Name == product.Name &
@@ -43,9 +43,9 @@ namespace Application.RealizationInterface
             return true;
 
         }
-        public async Task<bool> DeleteProductAsync(string url, string nameofobjectinstorage, string? pathfromstorage = null)
+        public async Task<bool> DeleteProductAsync(string url, string nameofobjectinstorage)
         {
-            var res = await _yandexClient.DeleteModel(pathfromstorage ?? _configuration["PathFromStorage"]!, nameofobjectinstorage);
+            var res = await _yandexClient.DeleteModel(_configuration["PathFromStorage"]!, nameofobjectinstorage);
             if (res) throw new Exception();
             var prod = _database.Products.Where(p =>
             p.Url == url).SingleOrDefault();
@@ -58,9 +58,9 @@ namespace Application.RealizationInterface
         public IEnumerable<Product> GetAllProducts() => _database.Products;
 
 
-        public async Task<string> UpdateProductAsync(Product product, Stream model, string nameofobjectinstorage, string? pathfromstorage = null)
+        public async Task<string> UpdateProductAsync(Product product, Stream model, string nameofobjectinstorage)
         {
-            var res = await _yandexClient.UpdateModel(model, pathfromstorage ?? _configuration["PathFromStorage"]!, nameofobjectinstorage);
+            var res = await _yandexClient.UpdateModel(model, _configuration["PathFromStorage"]!, nameofobjectinstorage);
             if (!res.isCorrect) throw new Exception();
             _database.Update(product);
             _database.SaveChanges();

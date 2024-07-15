@@ -23,22 +23,20 @@ let loader = new GLTFLoader();
 let obj = null;
 
 renderer.setClearColor(0x000000, 0);
+let main = document.getElementById("main-el");
+renderer.setSize(1000, 1000);
+let ul = document.getElementById("canvas-container");
+main.insertBefore(renderer.domElement, ul);
 
-renderer.setSize(200, 200);
-
-
+let positions = [];
 for (let j = 0; j < array.length; j++)
 {
-
-    let product = document.getElementById("prod-wrap " + j);
-
-    let productinfo = document.getElementById("info-prod " + j);
-
-    renderer.domElement.setAttribute("id", "Model " + j);
-
-    product.insertBefore(renderer.domElement, productinfo);
-
+    let el = "info-prod " + j;
+    let productinfo = document.getElementById(el);
+    let annonymusObjectCord = { x: productinfo.offsetLeft, y: productinfo.offsetTop }
+    positions.push(annonymusObjectCord);
 }
+renderer.domElement.setAttribute("id", "Model");
 camera.position.z = 10;
 
 pLight.position.set(1, 1, 53);
@@ -54,9 +52,9 @@ function animate() {
     camera.lookAt(scene.position)
 }
 for (let k = 0; k < array.length; k++) {
-    loader.load(array[k], function (object) {
+    loader.loadAsync(array[k]).then(object => {
         obj = object.scene;
-        obj.position.set(0, 0, -53);
+        obj.position.set(positions[k].x, positions[k].y, - 53)
         obj.rotation.x = 1.3;
         obj.rotation.y = 1.3;
         scene.add(obj);

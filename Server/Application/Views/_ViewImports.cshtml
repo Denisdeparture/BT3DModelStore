@@ -1,5 +1,8 @@
 ﻿@using ApplicationInfrastructure
 @using Application.Models
 @using DomainModel;
+@using Contracts;
 @inject IConfiguration Configuration
+@inject IWebHostEnvironment Host
+@inject ILogger<Program> Logger
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

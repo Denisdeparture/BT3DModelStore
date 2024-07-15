@@ -1,0 +1,48 @@
+﻿@using BuisnesLogic.Extensions
+@using BuisnesLogic.Models.SerializationModels
+@using BuisnesLogic.Service
+@using Application.HtmlHelpers;
+@using BuisnesLogic.Service.Managers
+@model ProductContractModel
+@{
+    string nameProperty = "Length";
+    var endpoints = new ConfigurationEndPointManager<AdminEndpointModel>(Configuration, "AdminEndpoints").GetAllEndPoints();
+    int counter = 1;
+}
+<head>
+    <link rel="stylesheet" href="../css/AdminPage.css" type="text/css" />
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+</head>
+<div class="main">
+    <div class="info">
+        <h1>Панель администрации</h1>
+    </div>
+    <div class="buttons">
+        <ul class="gen-el">
+            @for (int i = 0; i < endpoints.GetLengthFromThisCollection<AdminEndpointModel>(nameProperty); i++)
+            {
+                <li class="container">
+                    <div class="button_opt">
+                        <button name="@("tab" + counter)">@endpoints[i].Action</button>
+                    </div>
+                </li>
+                counter++;
+            }
+            <div hidden>@(counter = 1)</div>
+        </ul>
+        <div class="view-info">
+            
+            @for (int i = 0; i < endpoints.GetLengthFromThisCollection<AdminEndpointModel>(nameProperty); i++)
+            {
+                <div id="@("tab"+counter)">
+                    @* Заголовок *@
+                    <h2 class="header">@endpoints[i].Action</h2>
+                    @* функционал *@
+                    @Html.ShowMarkingFromThisPath(endpoints[i].PathFromMarking, Host, Logger)
+                </div>
+                counter++;
+            }
+        </div>
+    </div>
+</div>
+<script src="~/js/AdminPanel.js" type="module"></script>

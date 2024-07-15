@@ -4,25 +4,45 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Application.Models;
-using Application.RealizationInterface;
-using DataBase.AppDbContexts;
+using DomainModel;
 using ApplicationInfrastructure;
+using Application.Models.ViewModels;
 namespace Application.Controllers
 {
 
     public class MainController : Controller
     {
-        private readonly IProductOperation _productManager;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<Program> _logger;
-        public MainController(MainDbContext database, IYandexClient client, IConfiguration configuration, ILogger<Program> logger)
+        public MainController(IConfiguration configuration, ILogger<Program> logger)
         {
-            _productManager = new ProductOperation(database, client, configuration);
+            _configuration = configuration;
             _logger = logger;
         }
         [Authorize]
         public IActionResult Katalog()
         {
-            return View(_productManager.GetAllProducts());
+            using (var httpclient = new HttpClient())
+            {
+                // ProductEndpoint
+                string endpoint = Url.Action("GetAllProducts", "ProductEndpoint")!;
+                string url = _configuration["ServerPath:Protocol"] + "://" + _configuration["ServerPath:Host"] + endpoint;
+                _logger.LogInformation(url);
+                var task = httpclient.GetFromJsonAsync<IEnumerable<Product>>(url);
+                try
+                {
+                    task.Wait();
+                    var allProducts = task.Result;
+                    return View(allProducts);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message + Environment.NewLine + ex.StackTrace + Environment.NewLine + this.ToString());
+                    return BadRequest();
+                }
+
+            }
+            
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

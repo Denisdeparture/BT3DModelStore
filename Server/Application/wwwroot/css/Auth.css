@@ -2,8 +2,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
- 
 }
 html {
     background-repeat: no-repeat;
@@ -16,26 +14,25 @@ html {
 h1{
     color: black;
 }
-    .registration-cssave form {
+.registration-cssave form {
         max-width: 800px;
         padding: 50px 70px;
         border-radius: 10px;
         box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
         background-color: #fff;
-    }
+}
 
-        .registration-cssave form h3 {
+.registration-cssave form h3 {
             font-weight: bold;
             margin-bottom: 30px;
-        }
-
-    .registration-cssave .item {
+}
+.registration-cssave .item {
         border-radius: 10px;
         margin-bottom: 25px;
         padding: 10px 20px;
-    }
+}
 
-    .registration-cssave .create-account {
+.registration-cssave .create-account {
         border-radius: 30px;
         padding: 10px 20px;
         font-size: 18px;
@@ -44,8 +41,7 @@ h1{
         border: none;
         color: white;
         margin-top: 20px;
-    }
-
+}
 p {
     color: red;
 }
@@ -56,5 +52,6 @@ p {
     .registration-cssave form {
         padding: 50px 20px;
     }
-}}
 }
+
+

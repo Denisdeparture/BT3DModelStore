@@ -10,27 +10,27 @@ namespace WebServer
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger _logger;
         private UserOperation userOperationRep;
-        private AdminOperation adminOperationRep;
+        private RolesOperation adminOperationRep;
         public UnitOfWork(UserManager<User> usermanager, RoleManager<IdentityRole> rolemanager, ILogger logger)
         {
             _userManager = usermanager;
             _roleManager = rolemanager;
             _logger = logger;
         }
-        public UserOperation userOperations 
-        { 
-            get 
-            {
-                if (userOperationRep == null) userOperationRep = new UserOperation(_userManager, _roleManager, _logger);
-                return userOperationRep;
-            } 
-            set { } 
-        }
-        public AdminOperation adminOperations
+        public UserOperation userOperations
         {
             get
             {
-                if (adminOperationRep == null) adminOperationRep = new AdminOperation(_roleManager, _logger);
+                if (userOperationRep == null) userOperationRep = new UserOperation(_userManager, _roleManager, _logger);
+                return userOperationRep;
+            }
+            set { }
+        }
+        public RolesOperation adminOperations
+        {
+            get
+            {
+                if (adminOperationRep == null) adminOperationRep = new RolesOperation(_roleManager, _logger);
                 return adminOperationRep;
             }
             set { }

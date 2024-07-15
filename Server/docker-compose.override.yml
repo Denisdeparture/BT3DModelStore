@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  webclient:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=3000
+      # - ASPNETCORE_HTTPS_PORTS=3001
+    ports:
+      - "3000"
+      # - "3001"
+  webserver:
+     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5000
+      # - ASPNETCORE_HTTPS_PORTS=5001
+     ports:
+      - "5000"
+      # - "5001"
+     
+    

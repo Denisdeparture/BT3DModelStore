@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Tests", "..\Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuisnesLogic.Tests", "..\Tests\BuisnesLogic.Tests\BuisnesLogic.Tests.csproj", "{49E52A42-6DB9-410D-9EBC-8BF19DABF239}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{73DD3B35-D40A-40E8-8C0A-2EF220365E54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{49E52A42-6DB9-410D-9EBC-8BF19DABF239}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49E52A42-6DB9-410D-9EBC-8BF19DABF239}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49E52A42-6DB9-410D-9EBC-8BF19DABF239}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73DD3B35-D40A-40E8-8C0A-2EF220365E54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73DD3B35-D40A-40E8-8C0A-2EF220365E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73DD3B35-D40A-40E8-8C0A-2EF220365E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73DD3B35-D40A-40E8-8C0A-2EF220365E54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

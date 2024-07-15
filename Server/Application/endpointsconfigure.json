@@ -1,0 +1,21 @@
+{
+  "AdminEndpoints": {
+    "Add": {
+      "Url": "/AdminOperation/AddProduct",
+      "Action": "Добавление продукта",
+      "PathFromMarking": "/html/form-add.html"
+    },
+    "Delete": {
+      "Url": "/AdminOperation/DeleteProduct",
+      "Action": "Удаление продукта"
+    },
+    "Change": {
+      "Url": "/AdminOperation/UpdateProduct",
+      "Action": "Обновление продукта"
+    },
+    "All": {
+      "Url": "/ProductEndpoint/GetAllProducts",
+      "Action": "Посмотреть все продукты"
+    }
+  }
+}

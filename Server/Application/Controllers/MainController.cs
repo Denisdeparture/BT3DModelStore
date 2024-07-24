@@ -16,11 +16,10 @@ namespace Application.Controllers
         private readonly ILogger<Program> _logger;
         public MainController(IConfiguration configuration, ILogger<Program> logger)
         {
-            _configuration = configuration;
-            _logger = logger;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        [Authorize]
-        public IActionResult Katalog()
+        public IActionResult Catalog()
         {
             using (var httpclient = new HttpClient())
             {
@@ -42,7 +41,27 @@ namespace Application.Controllers
                 }
 
             }
-            
+        }
+        [Route("/Catalog/{id:int}")]
+        public async Task<IActionResult> ProductInCatalog(int id)
+        {
+            using (var httpclient = new HttpClient())
+            {
+                string endpoint = Url.Action("GetProductById", "ProductEndpoint", new {id})!;
+                string url = _configuration["ServerPath:Protocol"] + "://" + _configuration["ServerPath:Host"] + endpoint;
+                Product? product = null;
+                try
+                {
+                    product = await httpclient.GetFromJsonAsync<Product>(url);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message + Environment.NewLine + ex.StackTrace + Environment.NewLine + this.ToString());
+                }
+                if(product is null) { return BadRequest(); }
+                return View(product);
+
+            }
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

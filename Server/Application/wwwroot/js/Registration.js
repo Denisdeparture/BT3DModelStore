@@ -1,13 +1,11 @@
 ﻿const pass = document.getElementById("password");
 const confpass = document.getElementById("confirm-password");
-let message = "";
-pass.addEventListener("input", function (event)
+const sub = document.getElementById("sub");
+sub.addEventListener("input", function (event)
 {
     if (pass.value != confpass.value) {
-        message = "Пароли не совпадают";
+        pass.setCustomValidity("Пароли не совпадают");
+        event.preventDefault();
     }
-    else {
-        message = "";
-    }
-    pass.setCustomValidity(message);
+   
 });

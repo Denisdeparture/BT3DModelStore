@@ -1,7 +1,4 @@
-﻿.Login-form button {
-    background-image: url("~/assets/login.png");
-}
-.Login-form p {
+﻿.Login-form a, .Login-form p {
     color: white;
 }
 header {

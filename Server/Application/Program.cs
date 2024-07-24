@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using DataBase.AppDbContexts;
 using BuisnesLogic.Service.Clients;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using BuisnesLogic.Service.Managers;
 namespace ApplicationInfrastructure
 {
     public class Program
@@ -16,9 +17,8 @@ namespace ApplicationInfrastructure
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            // Add services to the container.
+            builder.Configuration.AddPantryStorage("11386f7e-195b-4cfe-9e09-081010a4a279", "PantryStorage");
             builder.Services.AddControllersWithViews();
-            builder.Configuration.AddJsonFile("appsettings.json").AddJsonFile("endpointsconfigure.json");
             builder.Services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -54,11 +54,10 @@ namespace ApplicationInfrastructure
             builder.Services.ConfigureApplicationCookie(opt =>
             {
                 opt.LoginPath = "/Account/Login";
+                opt.LogoutPath = "/Account/Logout";
             });
             builder.Services.AddMyValidations();
-            using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
-            ILogger<KafkaClient<User>> logger = factory.CreateLogger<KafkaClient<User>>();
-            builder.Services.AddKafkaClient<User>(builder.Configuration, logger);
+            builder.Services.AddKafkaClient<User>(builder.Configuration);
             builder.Services.AddJwtManager();
             var app = builder.Build();
             app.UseHttpsRedirection();
@@ -70,7 +69,7 @@ namespace ApplicationInfrastructure
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Main}/{action=Katalog}");
+                pattern: "{controller=Main}/{action=Catalog}");
 
             app.Run();
         }

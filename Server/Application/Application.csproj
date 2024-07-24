@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\SiteInfoPages.css" />
     <_ContentIncludedByDefault Remove="wwwroot\js\Registration.js" />
   </ItemGroup>
 
@@ -42,6 +43,13 @@
     <ProjectReference Include="..\BuisnesLogic\BuisnesLogic.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\DataBase\DataBase.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\css\AdminPage.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

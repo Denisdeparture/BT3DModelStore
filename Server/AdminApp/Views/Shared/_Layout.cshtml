@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/LayerStyles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a asp-area="" asp-controller="" asp-action="">контакты</a></li>
+                <li><a asp-area="" asp-controller="" asp-action="">доставка</a></li>
+                <li><a asp-area="" asp-controller="" asp-action="">оплата</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+    <footer>
+        <ul>
+            <li><a asp-area="" asp-controller="" asp-action="">О нас</a></li>
+            <li>Номер тех поддержки: </li>
+        </ul>
+    </footer>
+</body>
+</html>

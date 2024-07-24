@@ -1,0 +1,86 @@
+﻿@using Application.Models.ViewModels
+@model AccountViewModel
+@{
+    string protocol = Configuration["ServerPath:Protocol"]! + "://";
+    string host = Configuration["ServerPath:Host"]!;
+}
+<link rel="stylesheet" href="~/css/UserPanel.css" type="text/css" />
+<div class="main">
+    <div class="main-box">
+      <p class="head-text">Ваша учётная запись:</p>
+        @foreach (var role in Model.Roles!)
+        {
+            <p>@role</p>
+        }
+        <p>Имя: @Model.About.UserNickName</p>
+       @if (!string.IsNullOrEmpty(Model.About.LastName))
+        {
+            <p>Фамилия отчество: @Model.About.LastName</p>
+        }
+      <p>Последнее посещение: @Model.About.LastVisit.Date </p>
+      <p>Зарегистирован в: @Model.About.FirstVisit.Date</p>
+        @if (!string.IsNullOrWhiteSpace(@Model.About.PhoneNumber))
+        {
+            <p>Номер телефона: @Model.About.PhoneNumber</p>
+            <form method="post">
+                <button type="submit">Изменить</button>
+            </form>
+        }
+        else
+        {
+            <form>
+                <label id="phone">Добавить номер телефона</label>
+                <input id="phone" type="tel" required/>
+                <button type="submit">Принять</button>
+            </form>
+        }
+
+
+        @if (!string.IsNullOrWhiteSpace(@Model.About.Email))
+        {
+            <p>Электронная почта: @Model.About.Email</p>
+            <form method="post">
+                <button type="submit">Изменить</button>
+            </form>
+        }
+        else
+        {
+            <form>
+                <label id="mail">Добавить электронную почту</label>
+                <input id="mail" type="email" required/>
+                <button type="submit">Принять</button>
+            </form>
+        }
+        @if (Model.Roles.Where(r => r.Equals(RolesType.Admin.ToString())).FirstOrDefault() is not null)
+        {
+            <p>Перейти на страницу администратора</p>
+            <a asp-controller="@EndpointValueInStringStorage.AdminController" asp-action="@EndpointValueInStringStorage.AdminAction" asp-route-email="@Model.About.Email">Перейти</a>
+        }
+        <form method="post" class="exit" id="ex" asp-action="@EndpointValueInStringStorage.ExitAction" asp-controller="@EndpointValueInStringStorage.AccountContoller">
+            <button type="submit">Выйти из аккаунта</button>
+        </form>
+    </div>
+    <div class="info">
+      <p class="head-text">Ваши покупки:</p>
+      <ul>
+            @if (Model.Purchases is not null && Model.Purchases.Count != 0)
+            {
+                @foreach (var item in Model.Purchases)
+                {
+                    <li></li>
+                }
+            }
+      </ul>
+    </div>
+    <div class="user-func-panel">
+      <form>
+            @if (Model.Action is not null && Model.Action.Count != 0)
+            {
+                @foreach (var item in Model.Action)
+                {
+                    <a action="@(protocol + host + item.Url)"></a>
+                }
+            }
+      </form>
+    </div>
+</div>

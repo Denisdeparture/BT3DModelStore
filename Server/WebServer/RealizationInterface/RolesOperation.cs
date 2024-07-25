@@ -1,18 +1,21 @@
-﻿using Infrastructure;
+﻿using DomainModel;
+using Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace WebServer.RealizationInterface
 {
-    public class RolesOperation : IRoleOperation
+    public class RolesOperation : IRoleOperation, IUsersRolesOperation
     {
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<User> _userManager;
         
-        private readonly ILogger _logger;
-        public RolesOperation(RoleManager<IdentityRole> rolemanager, ILogger logger)
+        private readonly ILogger<Program> _logger;
+        public RolesOperation(RoleManager<IdentityRole> rolemanager, ILogger<Program> logger, UserManager<User> userManager)
         {
             _roleManager = rolemanager;
             _logger = logger;
+            _userManager = userManager;
         }
         public async Task<bool> CreateRole(string rolename)
         {
@@ -38,7 +41,18 @@ namespace WebServer.RealizationInterface
             _logger.LogError(string.Join(Environment.NewLine, res.Errors.Select(obj => obj.Description + Environment.NewLine + obj.Code).ToArray()));
             return res.Succeeded;
         }
+        public async Task<bool> AddRoleFromUserAsync(string email, string role)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null) return false;
+            var userHasThisRole = (await _userManager.GetRolesAsync(user)).Where(r => r.Equals(role)).FirstOrDefault();
+            if (string.IsNullOrEmpty(userHasThisRole))
+            {
+                await _userManager.AddToRoleAsync(user, role);
+                return true;
+            }
+            return false;
+        }
 
-        
     }
 }

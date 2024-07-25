@@ -55,7 +55,6 @@ namespace WebServer.RealizationInterface
 
         public IEnumerable<Product> GetAllProducts() => _database.Products;
 
-
         public async Task<string> UpdateProductAsync(Product product, Stream model, string nameofobjectinstorage)
         {
             var res = await _yandexClient.UpdateModel(model, _configuration["PathFromStorage"]!, nameofobjectinstorage);

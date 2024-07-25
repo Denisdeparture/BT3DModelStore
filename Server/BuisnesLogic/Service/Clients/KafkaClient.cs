@@ -33,7 +33,7 @@ namespace BuisnesLogic.Service.Clients
                 ClientId = clientid,
                 GroupId = groupid,
             };
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             BaseTopic = basetopic;
             Models = new ObservableCollection<TModel>();
         }
@@ -75,11 +75,7 @@ namespace BuisnesLogic.Service.Clients
                         if (res is not null)
                         {
                             data = JsonSerializer.Deserialize<TModel>(res.Message.Value);
-                        }
-                        else
-                        {
-                            const string errorMessage = "Data in party is null";
-                            _logger.LogError(DateTime.UtcNow + errorMessage);
+                            _logger.LogInformation(DateTime.UtcNow + this.ToString() + " User Added");
                         }
                     }
                     catch (Exception ex)

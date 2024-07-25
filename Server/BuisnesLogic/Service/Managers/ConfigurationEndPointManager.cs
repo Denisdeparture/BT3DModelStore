@@ -1,5 +1,5 @@
 ﻿using Amazon.Runtime.CredentialManagement;
-using BuisnesLogic.Models.SerializationModels;
+using BuisnesLogic.Model.DeserializationModels;
 using BuisnesLogic.ServicesInterface.ConfigurationEndPointsInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

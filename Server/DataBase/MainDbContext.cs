@@ -2,13 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+using BuisnesLogic.Model.Roles;
 namespace DataBase.AppDbContexts
 {
     public class MainDbContext : IdentityDbContext<User, IdentityRole, string>
     {
         public DbSet<Product> Products => Set<Product>();
-        private readonly string? _connectionString;
         public MainDbContext(DbContextOptions<MainDbContext> opt) : base(opt)
         {
             if (!Database.EnsureCreated())
@@ -16,14 +15,6 @@ namespace DataBase.AppDbContexts
                 Database.EnsureCreated();
             }
         }
-        public MainDbContext(string connectionstringtest)
-        {
-            _connectionString = connectionstringtest;
-        }
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(_connectionString);
-        //}
 
     }
         

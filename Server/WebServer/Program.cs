@@ -8,14 +8,18 @@ using DataBase.AppDbContexts;
 using WebServer.BackgroundServices;
 using BuisnesLogic.Service.Clients;
 using Microsoft.Extensions.DependencyInjection;
+using BuisnesLogic.Service.Managers;
+using Infrastructure;
+using WebServer.RealizationInterface;
 namespace WebServer
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+          
             var builder = WebApplication.CreateBuilder(args);
-            builder.Configuration.AddJsonFile("appsettings.json");
+            builder.Configuration.AddPantryStorage("11386f7e-195b-4cfe-9e09-081010a4a279", "PantryStorage");
             builder.Services.AddControllers();
             builder.Services.AddDbContext<MainDbContext>(opt =>
             {
@@ -34,10 +38,11 @@ namespace WebServer
             builder.Services.AddYandexCloud(builder.Configuration);
             builder.Services.AddJwtManager();
             builder.Services.AddMyValidations();
-          
-            using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
-            ILogger<KafkaClient<User>> logger = factory.CreateLogger<KafkaClient<User>>();
-            builder.Services.AddKafkaClient<User>(builder.Configuration, logger);
+            builder.Services.AddTransient<IProductOperation, ProductOperation>();
+            builder.Services.AddTransient<IRoleOperation, RolesOperation>();
+            builder.Services.AddTransient<IUsersRolesOperation, RolesOperation>();
+            builder.Services.AddTransient<IUserOperation, UserOperation>();
+            builder.Services.AddKafkaClient<User>(builder.Configuration);
             builder.Services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,6 +70,7 @@ namespace WebServer
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddHostedService<RegistrationService>();
+            
             var app = builder.Build();
             if (app.Environment.IsDevelopment())
             {
@@ -73,8 +79,8 @@ namespace WebServer
             }
             app.UseCors(builder.Configuration.GetSection("Polices")["First"] ?? "Default");
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
+            app.UseSeedRoles(app.Services);
             app.MapControllers();
 
             app.Run();

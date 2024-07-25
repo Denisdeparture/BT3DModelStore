@@ -1,28 +1,30 @@
 ﻿using AutoMapper;
+using BuisnesLogic.Model.Roles;
 using BuisnesLogic.ServicesInterface;
-using BuisnesLogic.ServicesInterface.ClientsInterfaces;
 using Contracts;
 using DataBase.AppDbContexts;
 using DomainModel;
 using Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using WebServer.RealizationInterface;
 namespace WebServer.Controllers
 {
     public class AdminOperationController : ControllerBase
     {
-        private readonly IProductOperation _productManager;
         private readonly IStrategyValidation _strategy;
-        private readonly ILogger<Program> _logger;
         private readonly IHostEnvironment _application;
         private readonly IConfiguration _configuration;
-        public AdminOperationController(MainDbContext database, IYandexClient client, IConfiguration configuration, IStrategyValidation cond, ILogger<Program> logger, IHostEnvironment application)
+        private readonly ILogger<Program> _logger;
+        private readonly IProductOperation _productOperations;
+        private readonly IUsersRolesOperation _userOperations;
+        public AdminOperationController(MainDbContext database,UserManager<User> userManager, IRoleOperation roleOperations, IUsersRolesOperation usersRolesOperation ,IProductOperation productOperation, RoleManager<IdentityRole> roleManager,  IConfiguration configuration, IStrategyValidation cond, ILogger<Program> logger, IHostEnvironment application, IServiceProvider provider)
         {
-            _productManager = new ProductOperation(database, client, configuration);
-            _strategy = cond;
-            _logger = logger;
-            _application = application;
-            _configuration = configuration;
+            _strategy = cond ?? throw new ArgumentNullException(nameof(cond));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _application = application ?? throw new ArgumentNullException(nameof(application));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _productOperations = productOperation ?? throw new ArgumentNullException(nameof(productOperation));
+            _userOperations = usersRolesOperation ?? throw new ArgumentNullException(nameof(usersRolesOperation));
         }
         [HttpPost("/AdminOperation/AddProduct")]
         public IActionResult AddProduct([FromForm] ProductContractModel productModel)
@@ -52,7 +54,7 @@ namespace WebServer.Controllers
             var ProductsInDBisValid = _strategy.StrategyCondition(new List<Predicate<IEnumerable<Product>>>()
             {
                 (products) => !products.Equals(null),
-            }, _productManager.GetAllProducts());
+            }, _productOperations.GetAllProducts());
             if (!ProductsInDBisValid)
             {
                 if (_application.IsDevelopment()) _logger.LogError("Product is not valid");
@@ -65,7 +67,7 @@ namespace WebServer.Controllers
             if (isExist) return BadRequest("this object exist");
             try
             {
-                var task = _productManager.CreateProductAsync(product, productModel.Model.OpenReadStream(), productModel.Model.FileName);
+                var task = _productOperations.CreateProductAsync(product, productModel.Model.OpenReadStream(), productModel.Model.FileName);
                 task.Wait();
             }
             catch (NullReferenceException ex)
@@ -86,14 +88,14 @@ namespace WebServer.Controllers
             }, productViewModel);
             if (!productViewIsValid) return BadRequest();
             var product = Mapping(productViewModel);
-            var productInBase = (_productManager.GetAllProducts().Where(prod =>
-            prod.Name == product.Name &
-            prod.Description == product.Description
-            ).SingleOrDefault());
+            var productInBase = (_productOperations.GetAllProducts().Where(prod =>
+        prod.Name == product.Name &
+        prod.Description == product.Description
+        ).SingleOrDefault());
             if (productInBase == null) return NoContent();
             try
             {
-                await _productManager.UpdateProductAsync(productInBase, productViewModel.Model.OpenReadStream(), productViewModel.Model.FileName);
+                await _productOperations.UpdateProductAsync(productInBase, productViewModel.Model.OpenReadStream(), productViewModel.Model.FileName);
             }
             catch (NullReferenceException ex)
             {
@@ -110,9 +112,23 @@ namespace WebServer.Controllers
                 (pw) => string.IsNullOrEmpty(pw.NameOfFile)
             }, deleteProductViewModel);
             if (deleteViewIsValid) return BadRequest();
-            var res = await _productManager.DeleteProductAsync(deleteViewIsValid.Object!.Url, deleteViewIsValid.Object!.NameOfFile);
+            var res = await _productOperations.DeleteProductAsync(deleteViewIsValid.Object!.Url, deleteViewIsValid.Object!.NameOfFile);
             if (!res) return BadRequest();
             return Ok();
+        }
+        [HttpPost("/AdminOperation/ChangeUserRole")]
+        public async Task<IResult> ChangeUserRole([FromForm]ChangeRoleContract roleContract)
+        {
+
+            var IsValid = _strategy.StrategyCondition(new List<Predicate<ChangeRoleContract>>()
+            {
+                (pw) => !string.IsNullOrEmpty(pw.Email),
+                (pw) => !string.IsNullOrEmpty(pw.Role),
+                (pw) => roleContract.Role!.ToLower().Equals(RolesType.User.ToString().ToLower()) | roleContract.Role.ToLower().Equals(RolesType.Admin.ToString().ToLower())
+            }, roleContract);
+            if (!IsValid) return Results.BadRequest();
+            var res = await _userOperations.AddRoleFromUserAsync(roleContract.Email!, roleContract.Role!);
+            return res ? Results.Ok() : Results.NotFound();
         }
         private Product Mapping(ProductContractModel productViewModel)
         {

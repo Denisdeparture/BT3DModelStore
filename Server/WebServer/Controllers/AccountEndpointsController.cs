@@ -1,11 +1,11 @@
-﻿using BuisnesLogic.Service;
+﻿using Amazon.Runtime;
+using BuisnesLogic.Service;
 using BuisnesLogic.Service.Managers;
+using BuisnesLogic.ServicesInterface;
 using Contracts;
 using DomainModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata;
 using System.Text.Json;
 namespace WebServer.Controllers
 {
@@ -13,31 +13,46 @@ namespace WebServer.Controllers
     {
         private readonly JwtManager _jwtManager;
         private readonly UserManager<User> _userManager;
-        private readonly UnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
         private readonly ILogger<Program> _logger;
-        public AccountEndpointsController(JwtManager jwtmanager, UserManager<User> usermanager, RoleManager<IdentityRole> roleManager, ILogger<Program> logger, IConfiguration configuration)
+        private readonly IStrategyValidation _validator;
+        public AccountEndpointsController(JwtManager jwtmanager, UserManager<User> usermanager, RoleManager<IdentityRole> roleManager, ILogger<Program> logger, IConfiguration configuration, IStrategyValidation validator)
         {
             _jwtManager = jwtmanager;
             _userManager = usermanager;
-            _unitOfWork = new UnitOfWork(usermanager,roleManager,logger);
             _configuration = configuration;
             _logger = logger;
+            _validator = validator;
         }
-        [HttpGet("/AccountEndpoint/Login")]
-        public async Task<IActionResult> Login([FromQuery]User obj)
+        [HttpGet("/AccountEndpoints/Login")]
+        public async Task<IActionResult> Login([FromQuery]User user)
         {
-           
-            var user = await _userManager.FindByEmailAsync(obj.Email!);
-            if(user == null || !(user.PasswordHash!.Equals( obj.PasswordHash)))
+            
+            var isValid = _validator.StrategyCondition(new List<Predicate<User>>()
+            {
+                (pw) => pw != null
+            }, user);
+            if (!isValid) return BadRequest();
+            var userInBase = await _userManager.FindByEmailAsync(user.Email!);
+            if(userInBase == null || !(userInBase.PasswordHash!.Equals( user.PasswordHash)))
             {
                 return Unauthorized();
             }
-            var token = await JwtCreator.CreateTokenAsync(user, _jwtManager);
+            var token =  JwtCreator.CreateTokenAsync(userInBase, _jwtManager);
 
-            return Ok(JsonSerializer.Serialize(new UserJwtContract() { JwtToken = token, User = user}));
+            return Ok(JsonSerializer.Serialize(new UserJwtContract() { JwtToken = token, User = userInBase}));
         }
-        
+        [HttpGet("/AccountEndpoints/GetUserInfo")]
+        public async Task<IActionResult> GetUserInfo([FromQuery] string email)
+        {
+            var isValid = _validator.StrategyCondition(new List<Predicate<string>>() {
+                (pw) => !string.IsNullOrWhiteSpace(pw),
+            }, email);
+            if(!isValid) return BadRequest();
+            var res = await _userManager.FindByEmailAsync(email!);
+            return res is not null ? Ok(JsonSerializer.Serialize<User>(res)) : NotFound();
+
+        }
 
     }
 }

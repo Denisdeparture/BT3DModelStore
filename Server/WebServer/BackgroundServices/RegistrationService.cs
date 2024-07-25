@@ -1,38 +1,20 @@
-﻿
-using BuisnesLogic.Service.Clients;
-using BuisnesLogic.ServicesInterface.ClientsInterfaces.MessageBrokers;
+﻿using BuisnesLogic.ServicesInterface.ClientsInterfaces.MessageBrokers;
 using DomainModel;
-using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json.Linq;
-using System.Collections.ObjectModel;
+using Infrastructure;
 using System.Collections.Specialized;
-
 namespace WebServer.BackgroundServices
 {
     public class RegistrationService : BackgroundService
     {
         private readonly IConsumeClient<User> _messageBroker;
         private readonly ILogger<Program> _logger;
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        //private readonly IServiceProvider _serviceProvider;
-        private readonly UnitOfWork _unitOfWork;
-        private readonly IConfiguration _configuration;
-        public readonly CancellationTokenSource _tokenSource;
-        public RegistrationService(ILogger<Program> logger, IServiceProvider serviceProvider,IMessageBrokerClient<User> client,IConfiguration configuration)
+        private readonly IServiceProvider _serviceProvider;
+        public RegistrationService(ILogger<Program> logger,IMessageBrokerClient<User> client, IServiceProvider serviceProvider)
         {
-            _messageBroker = client;
-            _tokenSource = new CancellationTokenSource();
-            var scopeUserManager = serviceProvider.CreateScope();
-            _userManager = scopeUserManager.ServiceProvider.GetRequiredService<UserManager<User>>();
-            var scopeRoleManager = serviceProvider.CreateScope();
-            _roleManager = scopeRoleManager.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>(); 
-            _unitOfWork = new UnitOfWork(_userManager, _roleManager, logger);
-            _configuration = configuration;
-            _logger = logger;
-            //_serviceProvider = serviceProvider;
-            var users = _messageBroker.Models;
-            users.CollectionChanged += Users_Register;
+            _messageBroker = client ?? throw new ArgumentNullException(nameof(client));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _serviceProvider = serviceProvider  ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _messageBroker.Models.CollectionChanged += Users_Register;
         }
         private void Users_Register(object? sender, NotifyCollectionChangedEventArgs e)
         {
@@ -43,33 +25,40 @@ namespace WebServer.BackgroundServices
         }
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var task = _unitOfWork.adminOperations.CreateRole("Test");
-            task.Wait();
-            // Test Functional ^
+            CancellationTokenSource _tokenSource = new CancellationTokenSource();
             var factoryTask = new TaskFactory(stoppingToken);
             var tasks = new[] 
             {
-              factoryTask.StartNew(() => _messageBroker.Consume(60, _tokenSource)),
-              factoryTask.StartNew(() => _messageBroker.Consume(60, _tokenSource)) 
+              factoryTask.StartNew(() => _messageBroker.Consume(20, _tokenSource)),
+              factoryTask.StartNew(() => _messageBroker.Consume(20, _tokenSource)) 
             };
             return Task.CompletedTask;
         }
         private async void Register(IEnumerable<User> users)
         {
+            var operation = _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IUserOperation>();
             foreach (var user in users)
             {
-                var userexist = await _userManager.FindByEmailAsync(user.Email!);
+                User? userexist = null;
+                try
+                {
+                    userexist = operation.GetAllUsers().Where(us => us.Email!.Equals(user.Email)).SingleOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(DateTime.UtcNow + Environment.NewLine + ex.Message + Environment.NewLine + ex.StackTrace + Environment.NewLine + this.ToString() + " maybe in system was two equals email");
+                }
                 if (userexist is null)
                 {
-                    var res = await _unitOfWork.userOperations.Register(user, _configuration["Roles:User"]!);
-                    if (!res)
+                    var res = await operation.Register(user);
+                    if (!res.IsSuccesed)
                     {
-                        const string message = "user is not added";
-                        throw new Exception(DateTime.UtcNow + Environment.NewLine + this.ToString() + Environment.NewLine + message);
+                        _logger.LogError($"{DateTime.UtcNow} {this.ToString()}: {string.Join(" ",res.Errors!.Select(ex => ex.Message + " "))}");
+                        throw new NullReferenceException();
+                        
                     }
                 }
             }
-
         }
     }
 }

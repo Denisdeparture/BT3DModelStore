@@ -1,34 +1,34 @@
-﻿@model LoginViewModel
+﻿@using Application.Models.ViewModels
+@model LoginViewModel
 @{
     int counterIcon = 0;
+    int maxlengthData = 64;
 }
 <link rel="stylesheet" href="../css/Auth.css" type="text/css" />
 <div class="main">
 <div class="registration-cssave">
-    
     <form asp-controller="Account" asp-action="ProviderAuthentication" asp-route-returnUrl="@Model.ReturnUrl">
         <h1>Войдите через: </h1>
         @foreach(var provider in Model.genericDatas)
         {
             <button type="submit"
                     name="provider"
-                    value="@provider.Name"
-                    >
+                    value="@provider.Name">
                 <img src="@Model.IconUrlLink[counterIcon]" alt="@provider.DisplayName" height="50" width="50" />
             </button>
             counterIcon++;
         }
     </form>
-    <form method="post" asp-action="Authentication", asp-controller="Home", asp-route-returnUrl="@Model.ReturnUrl">
+    <form method="post" asp-action="Login", asp-controller="Account", asp-route-returnUrl="@Model.ReturnUrl">
         <h3 class="text-center">Форма ВХОДА</h3>
         <div class="form-group">
             <label asp-for="Password"></label><br />
-            <input class="form-control item" type="password" asp-for="Password" minlength="6" required>
+            <input class="form-control item" type="password" asp-for="Password" minlength="6" maxlength="@maxlengthData" required>
             <span asp-validation-for="Password"></span>
         </div>
         <div class="form-group">
             <label asp-for="Mail"></label><br />
-            <input class="form-control item" type="email" asp-for="Mail" required>
+            <input class="form-control item" type="email" asp-for="Mail" maxlength="@maxlengthData" required>
             <span asp-validation-for="Mail"></span>
         </div>
         <div class="form-group">

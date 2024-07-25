@@ -1,0 +1,64 @@
+﻿@model IEnumerable<Product> 
+@{
+    string collecionUrlInstr = string.Join(" ", Model.Select(obj => obj.Url).ToArray());
+}
+<script type="importmap">
+  {
+    "imports": {
+        "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.165.0/three.module.js"
+    }
+  }
+</script>
+<link rel="stylesheet" href="../css/Katalog.css" type="text/css" />
+  <div class="main" id="main-el">
+        <input type="checkbox" id="side-checkbox" />
+        <div class="side-panel">
+            <label class="side-button-2" for="side-checkbox">+</label>
+            <div class="side-title">
+                <h2>Поиск</h2>
+         
+                <form method="post" action="">
+                    <input type="text" placeholder="Введите название товара" />
+                    <button type="submit">Найти товар</button>
+                    <img src="" alt="logo">
+                </form>
+            </div>
+        </div>
+
+
+        <div hidden id="test">@collecionUrlInstr</div>
+        <div class="side-button-1-wr">
+            <label class="side-button-1" for="side-checkbox">
+                <div class="side-b side-open"><img src="../assets/three_line.png" alt="logo" width="50" height="50"></div>
+                 <div class="side-b side-close"><img src="../assets/three_line.png" alt="logo" width="50" height="50"></div>
+            </label>
+        </div>
+    @if (Model.ToArray().Length != 0)
+    {
+        <ul class="products clearfix" id="canvas-container">
+            @for (int i = 0; i < Model.ToArray().Length; i++)
+            {
+                <li class="product-wrapper">
+                    <a asp-action="ProductInCatalog" asp-controller="Main" asp-route-id="@Model.ToArray()[i].Id" class="product" id="prod-wrap @i">
+                        <div class="info" id="info-prod @i">
+                            <p>@Model.ToArray()[i].Name</p>
+                            <p>Цена: @Model.ToArray()[i].Price</p>
+                        </div>
+                        <div class="button-action">
+                            <form method="post">
+                                <button type="submit">В козину</button>
+                            </form>
+                            <form method="post" asp-action="ProductInCatalog" asp-controller="Main" asp-route-id="@Model.ToArray()[i].Id">
+                                <button type="submit">Купить в один клик</button>
+                            </form>
+                        </div>
+                    </a>
+                </li>
+            }
+        </ul>
+     
+    }
+    <script src="~/js/Katalog.js" type="module"></script>
+</div>
+
+

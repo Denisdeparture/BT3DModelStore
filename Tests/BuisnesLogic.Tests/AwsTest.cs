@@ -1,4 +1,4 @@
-﻿using BuisnesLogic.Service;
+﻿using BuisnesLogic.Service.Clients;
 using BuisnesLogic.ServicesInterface;
 using System;
 using System.Collections.Generic;

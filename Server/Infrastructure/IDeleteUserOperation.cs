@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.ModelResult;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace Infrastructure
 {
     public interface IDeleteUserOperation
     {
-        public Task<bool> Delete(string id);
+        public Task<UserOperationModel> Delete(string id);
     }
 }

@@ -2,52 +2,125 @@
 using Microsoft.AspNetCore.Identity;
 using System.Collections;
 using DomainModel;
+using BuisnesLogic.Model.Roles;
+using BuisnesLogic.Model;
+using Infrastructure.ModelResult;
+using System.Linq.Expressions;
 namespace WebServer.RealizationInterface
 {
     public partial class UserOperation : IUserOperation, IDeleteUserOperation
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ILogger _logger;
-        public UserOperation(UserManager<User> usermanager, RoleManager<IdentityRole> rolemanager, ILogger logger) 
+        private readonly ILogger<Program> _logger;
+        public UserOperation(UserManager<User> usermanager, RoleManager<IdentityRole> rolemanager, ILogger<Program> logger) 
         { 
             _userManager = usermanager;
             _roleManager = rolemanager;
             _logger = logger;
         }
-        public async Task<bool> Delete(string id)
+        public async Task<UserOperationModel> Delete(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            var res = await _userManager.DeleteAsync(user!);
-            _logger.LogError(string.Join(Environment.NewLine, res.Errors.Select(obj => obj.Description + Environment.NewLine + obj.Code).ToArray()));
-            return res.Succeeded;
+            var model = new UserOperationModel()
+            {
+                IsSuccesed = true,
+                Errors = new List<Exception>()
+            };
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                var res = await _userManager.DeleteAsync(user!);
+                if (res.Errors.ToList().Count != 0)
+                {
+                    foreach (var error in res.Errors)
+                    {
+                        model.Errors.Add(new Exception(error.Description));
+                    }
+                    model.IsSuccesed = false;
+                    return model;
+                }
+            }
+            catch(Exception ex)
+            {
+                model.Errors.Add(ex);
+                model.IsSuccesed = false;
+                return model;
+            }
+          
+           
+            return new UserOperationModel() { IsSuccesed = true };
         }
         public IEnumerable<User> GetAllUsers()
         {
             return _userManager.Users;
         }
-        public async Task<bool> Register(User user,string role)
+        public async Task<UserOperationModel> Register(User user)
         {
-             var resCreate = await CreateUserAsync(user);
-             if (!resCreate)
-             {
-                _logger.LogError("An error occurred during creation");
-                return false;
-             }
-             if ((await _userManager.GetRolesAsync(user)).Where(r => r == role).SingleOrDefault() != null) 
-             {
-                _logger.LogError("This user have this role");
-                return false;
-             }
-            var res = await _userManager.AddToRoleAsync(user, (_roleManager.Roles.Where(r => r.Name == role).SingleOrDefault() ?? new IdentityRole() { Name = "Test"}).Name! );
-            _logger.LogError(string.Join(Environment.NewLine, res.Errors.Select(obj => obj.Description + Environment.NewLine + obj.Code).ToArray()));
-            return res.Succeeded;
+            var model = new UserOperationModel()
+            {
+                IsSuccesed = true,
+                Errors = new List<Exception>()
+            };
+            var taskCreate = CreateUserAsync(user);
+            taskCreate.Wait();
+            var resCreate = taskCreate.Result;
+            if (!resCreate.IsSuccesed)
+            {
+                model.IsSuccesed = false;
+                foreach(var error in resCreate.Errors!)
+                {
+                    model.Errors.Add(error);
+                }
+                return model;
+            }
+            try
+            {
+                var task = _userManager.AddToRoleAsync(user, RolesType.User.ToString());
+                task.Wait();
+                var res = task.Result;
+                if (res.Errors.ToList().Count != 0)
+                {
+                    foreach (var error in res.Errors)
+                    {
+                        model.Errors.Add(new Exception(error.Description));
+                    }
+                    model.IsSuccesed = false;
+                    return model;
+                }
+            }
+            catch(Exception ex)
+            {
+                model.Errors.Add(ex);
+                model.IsSuccesed = false;
+                return model;
+            }
+            return model;
         }
-        public async Task<bool> Update(string id, User newdatauser)
+        public async Task<UserOperationModel> Update(string id, User newdatauser)
         {
-            var nowUser = await _userManager.FindByIdAsync(id.ToString());
-            if(nowUser == null) return false;
-            for(int i = 0; i < nowUser.GetType().GetProperties().Length; i++)
+            var model = new UserOperationModel()
+            {
+                IsSuccesed = true,
+                Errors = new List<Exception>()
+            };
+            User? nowUser = null; 
+            try
+            {
+                nowUser = await _userManager.FindByIdAsync(id);
+                if (nowUser is null)
+                {
+                    model.Errors.Add(new Exception($"updating was incorrect because user was null"));
+                    model.IsSuccesed = false;
+                    return model;
+                }
+            }
+            catch(Exception ex)
+            {
+                model.Errors.Add(ex);
+                model.IsSuccesed = false;
+                return model;
+            }
+            for(int i = 0; i < nowUser!.GetType().GetProperties().Length; i++)
             {
                 try
                 {
@@ -55,43 +128,76 @@ namespace WebServer.RealizationInterface
                 }
                 catch(Exception ex)
                 {
-                    _logger.LogError(ex.Message + ex.StackTrace + ex.Source);
-                    return false;
+                    model.IsSuccesed = false;
+                    model.Errors.Add(ex);
+                    return model;
                 }
             }
-            var res = await _userManager.UpdateAsync(nowUser);
-            _logger.LogError(string.Join(Environment.NewLine, res.Errors.Select(obj => obj.Description + Environment.NewLine + obj.Code).ToArray()));
-            return res.Succeeded;
-        }
-        private async Task<bool> CreateUserAsync(User user)
-        {
-            var correction = await _userManager.FindByEmailAsync(user.Email!);
-            if (correction != null)
+            try
             {
-                _logger.LogWarning(correction.Id + "is using");
-                return false;
+                var result = await _userManager.UpdateAsync(nowUser);
+                if (result.Errors.ToList().Count != 0)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        model.Errors.Add(new Exception(error.Description));
+                    }
+                    model.IsSuccesed = false;
+                    return model;
+                }
+                return model;
             }
-            var res = await _userManager.CreateAsync(user);
-            _logger.LogError(string.Join(Environment.NewLine, res.Errors.Select(obj => obj.Description + Environment.NewLine + obj.Code).ToArray()));
-            return res.Succeeded;
-        }
-    }
-    public partial class UserOperation : IEnumerable<User>
-    {
-        public IEnumerator<User> GetEnumerator()
-        {
-           foreach (var user in _userManager.Users)
-           {
-                yield return user; 
-           }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            foreach (var user in _userManager.Users)
+            catch (Exception ex)
             {
-                yield return user;
+                return new UserOperationModel { IsSuccesed = false, Errors = new List<Exception>() { ex } };
             }
+        
+        }
+       
+        private async Task<UserOperationModel> CreateUserAsync(User user)
+        {
+            var model = new UserOperationModel()
+            {
+                IsSuccesed = true,
+                Errors = new List<Exception>()
+            };
+            try
+            {
+                var userExist = await _userManager.FindByEmailAsync(user.Email!);
+                if (userExist is not null)
+                {
+                    model.IsSuccesed = false;
+                    model.Errors.Add(new Exception($"{userExist.Email} was not null"));
+                    return model;
+                }
+            }
+            catch(Exception ex)
+            {
+                model.IsSuccesed = false;
+                model.Errors.Add(ex);
+                return model;
+            }
+            try
+            {
+                var res = await _userManager.CreateAsync(user);
+                if (res.Errors.ToList().Count != 0)
+                {
+                    model.IsSuccesed = false;
+                    foreach (var error in res.Errors)
+                    {
+                        model.Errors.Add(new Exception(error.Description));
+                    }
+                    return model;
+                }
+                return model;
+            }
+            catch (Exception ex)
+            {
+                model.IsSuccesed = false;
+                model.Errors.Add(ex);
+                return model;
+            }
+   
         }
     }
 }

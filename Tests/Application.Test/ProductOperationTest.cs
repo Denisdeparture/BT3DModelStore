@@ -1,7 +1,4 @@
-﻿using Application.Controllers;
-using Application.Models;
-using ApplicationInfrastructure;
-using BuisnesLogic.Model;
+﻿using ApplicationInfrastructure;
 using BuisnesLogic.ServicesInterface;
 using DataBase.AppDbContexts;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +7,11 @@ using Moq;
 using NUnit.Framework.Internal;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 using Microsoft.Extensions.Logging;
-namespace Application.Tests
+using Application.Controllers;
+using BuisnesLogic.Service;
+using BuisnesLogic.Model.ServiceResultModels;
+using BuisnesLogic.ServicesInterface.ClientsInterfaces;
+namespace WebServer.Tests
 {
     public class ProductOperationTest
     {
@@ -19,7 +20,7 @@ namespace Application.Tests
         private AdminController controller;
         private IConfiguration Configuration;
         private Mock<IYandexClient>? mockYandexClient;
-        private IStrategyConditions Strategy;
+        private IStrategyValidation Strategy;
         private MainDbContext data;
         private Mock<ILogger<Program>> mocklogger;
 #pragma warning restore NUnit1032
@@ -43,7 +44,7 @@ namespace Application.Tests
             Configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(initialization!)
                 .Build();
-            Strategy = new StrategyConditions();
+            Strategy = new StrategyValidation();
             data = new MainDbContext("Server=PC;Database=ApplicationDataBase;Trusted_Connection=True;TrustServerCertificate=True;Connection Timeout=60");
             controller = new AdminController(data, mockYandexClient.Object, Configuration, Strategy, mocklogger.Object);
         }

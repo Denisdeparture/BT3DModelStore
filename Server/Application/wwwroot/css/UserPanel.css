@@ -1,0 +1,46 @@
+﻿.main-box, .info, .user-func-panel {
+    font-size: 30px;
+    border: solid black 4px;
+    padding: 20px;
+    width: 20%;
+    border-radius: 20px;
+    box-shadow: -1px 10px 19px -9px rgba(0,0,0,0.63);
+    -webkit-box-shadow: -1px 10px 19px -9px rgba(0,0,0,0.63);
+    -moz-box-shadow: -1px 10px 19px -9px rgba(0,0,0,0.63);
+    background-color: white;
+    float: left;
+}
+
+.user-func-panel button {
+    display: table;
+    margin-top: 10px;
+}
+
+body {
+    background-color: rgb(237, 218, 240);
+}
+
+.main-box form button {
+    font-size: 25px;
+    background: rgb(238,174,235);
+    background: radial-gradient(circle, rgba(238,174,235,1) 26%, rgba(96,129,226,1) 95%);
+}
+
+.main-box form button:hover {
+    background: rgb(242, 230, 242);
+    background: radial-gradient(circle, rgba(242, 230, 242,1) 26%, rgba(96,129,226,1) 95%);
+}
+
+.exit {
+    margin-top: 10%;
+}
+
+.exit button:hover {
+    color: red;
+}
+
+.head-text {
+    font-size: 30px;
+    font-weight: bold;
+}
+

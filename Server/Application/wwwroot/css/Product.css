@@ -1,0 +1,46 @@
+﻿body {
+    background: rgb(23,22,61);
+    background: linear-gradient(120deg, rgba(23,22,61,1) 44%, rgba(106,32,43,1) 76%);
+}
+
+.main-box {
+    margin-top: 10%;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: auto;
+    background-color: rgb(237, 218, 240);
+    position: relative;
+    border: solid;
+    border-color: rgb(237, 218, 240);
+    border-radius: 10px;
+    width: 50%;
+    height: auto;
+    box-shadow: 2px 12px 10px -3px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 2px 12px 10px -3px rgba(0,0,0,0.75);
+    -moz-box-shadow: 2px 12px 10px -3px rgba(0,0,0,0.75);
+}
+
+.info {
+    display: flex;
+    margin-left: 90%;
+}
+
+.functional-button {
+    display: flex;
+    padding-top: 70px;
+}
+
+.functional-button form button {
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #3f93ff;
+    border: none;
+    color: white;
+    margin: 4px;
+}
+
+.functional-button form button:hover {
+    background-color: #3985e6;
+}

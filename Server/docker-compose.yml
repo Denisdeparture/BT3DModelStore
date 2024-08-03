@@ -1,0 +1,70 @@
+version: '3.4'
+
+services:
+
+  webclient:
+    image: ${DOCKER_REGISTRY-}application
+    build:
+      context: .
+      dockerfile: Application/Dockerfile
+  webserver:
+     image: ${DOCKER_REGISTRY-}webserver
+     build:
+       context: .
+       dockerfile: WebServer/Dockerfile
+     depends_on:
+        - database
+     ports:
+     - "5000:5000"
+  proxy:
+      container_name: web-proxy
+      image: ${DOCKER_REGISTRY-}nginx
+      volumes:
+       - ./nginx.conf:/etc/nginx/nginx.conf
+      ports:
+        - "80:80"
+      depends_on:
+        - database
+  database:
+      container_name: database-postgres
+      image: ${DOCKER_REGISTRY-}postgres
+      environment:
+           - POSTGRES_USER=postgresRU
+           - POSTGRES_PASSWORD=rtps
+      ports:
+        - "5432:5432"
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:3.9
+    ports:
+      - "2181:2181"
+    environment:
+     ALLOW_ANONYMOUS_LOGIN: yes
+  message_broker:
+      image: ${DOCKER_REGISTRY-}bitnami/kafka
+      ports:
+      - "9092:9092"
+      environment:
+       KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+       KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+       KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://message_broker:9092
+       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+       # JMX_PORT: 9997
+       # KAFKA_CFG_PROCESS_ROLES: controller,broker
+       # KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      depends_on:
+      - zookeeper
+  kafka_ui:
+      container_name: kafka-ui
+      image: ${DOCKER_REGISTRY-}provectuslabs/kafka-ui
+      ports:
+      - "9100:8080"
+      environment:
+        KAFKA_CLUSTERS_0_NAME: transitional_path
+        KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: message_broker:9092
+        KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+        KAFKA_CLUSTERS_0_JMXPORT: 9997
+        DYNAMIC_CONFIG_ENABLED: true
+      depends_on: 
+      - message_broker
+      
+

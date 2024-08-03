@@ -16,14 +16,14 @@ namespace DataBase.AppDbContexts
                 Database.EnsureCreated();
             }
         }
-        public MainDbContext(string connectionstring)
+        public MainDbContext(string connectionstringtest)
         {
-            _connectionString = connectionstring;
+            _connectionString = connectionstringtest;
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_connectionString);
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(_connectionString);
+        //}
 
     }
         

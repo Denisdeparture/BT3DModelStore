@@ -1,0 +1,69 @@
+﻿.main {
+    margin-top: 10em;
+}
+
+body {
+    background-color: rgb(235, 206, 211);
+}
+
+.buttons {
+    border: solid, 1px;
+    border-color: rgb(230, 204, 209);
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    background-color: white;
+}
+
+.buttons ul {
+    list-style-type: none;
+}
+
+.button_opt {
+    padding-top: 3px;
+    position: relative;
+    right: 2%;
+    bottom: 1em;
+}
+
+.button_opt button {
+     width: 80px;
+     height: 80px;
+}
+
+.info h1 {
+    font-size: 200%;
+    border-bottom: 4px inset black;
+}
+
+.view-info {
+    position: relative;
+    left: 50%;
+    bottom: 10em;
+}
+
+.view-info p {
+     font-size: 30px;
+}
+.function button{
+       display: block;
+       margin-top: 20px;
+       font-size: 20px;
+       border-color: white;
+       border-radius: 5px;
+       background: rgb(238,174,235);
+       background: radial-gradient(circle, rgba(238,174,235,1) 26%, rgba(96,129,226,1) 95%);
+}
+function button :hover {
+    background: rgb(242, 230, 242);
+    background: radial-gradient(circle, rgba(242, 230, 242,1) 26%, rgba(96,129,226,1) 95%);
+}
+.function label, .function input {
+      display: block;
+      margin-top: 20px;
+      border-color: white;
+      border-radius: 10px;
+}
+

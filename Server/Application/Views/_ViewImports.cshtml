@@ -1,5 +1,11 @@
 ﻿@using ApplicationInfrastructure
 @using Application.Models
 @using DomainModel;
+@using Contracts;
+@using BuisnesLogic.ConstStorage;
+@using BuisnesLogic.Model.Roles;
+@using System.Security.Claims;
 @inject IConfiguration Configuration
+@inject IWebHostEnvironment Host
+@inject ILogger<Program> Logger
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

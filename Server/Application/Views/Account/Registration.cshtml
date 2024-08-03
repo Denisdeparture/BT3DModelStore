@@ -1,6 +1,7 @@
-﻿@model RegisterViewModel
+﻿@using Application.Models.ViewModels
+@model RegisterViewModel
 @{
-
+    int maxlengthData = 64;
 }
 <link rel="stylesheet" href="../css/Auth.css" type="text/css"/>
 <div class="main">
@@ -9,30 +10,29 @@
         <h3 class="text-center">Форма РЕГИСТРАЦИИ</h3>
         <div class="form-group">
             <label asp-for="Password"></label><br />
-            <input class="form-control item" type="password" asp-for="Password" minlength="6" required>
-            <span asp-validation-for="Password"></span>
+            <input id="password" class="form-control item" type="password" asp-for="Password" minlength="6" maxlength="@maxlengthData" required>
         </div>
         <div class="form-group">
             <label asp-for="PasswordConfirm"></label><br />
-            <input class="form-control item" type="password" asp-for="PasswordConfirm" minlength="6" required>
-            <span asp-validation-for="PasswordConfirm"></span>
+            <input id="confirm-password" class="form-control item" type="password" asp-for="PasswordConfirm" minlength="6" maxlength="@maxlengthData" required>
         </div>
         <div class="form-group">
             <label asp-for="Name"></label><br />
-            <input class="form-control item" type="text" asp-for="Name" required>
+            <input class="form-control item" type="text" asp-for="Name" maxlength="@maxlengthData" required>
         </div>
         <div class="form-group">
             <label asp-for="LastName"></label><br />
-            <input class="form-control item" type="password" asp-for="LastName" required>
+            <input class="form-control item" type="text" asp-for="LastName" maxlength="@maxlengthData">
         </div>
         <div class="form-group">
             <label asp-for="Mail"></label><br/>
-            <input class="form-control item" type="email" asp-for="Mail" required>
+            <input class="form-control item" type="email" asp-for="Mail" maxlength="@maxlengthData" required>
         </div>
         <div class="form-group">
-            <button class="btn btn-primary btn-block create-account" type="submit">Зарегистрироваться</button>
+            <button class="btn btn-primary btn-block create-account" id="sub" type="submit">Зарегистрироваться</button>
         </div>
             <a asp-controller="Account" asp-action="Login"><p>Имеете аккаунт?</p></a>
     </form>
     </div>
 </div>
+<script src="~/js/Registration.js" type="module"></script> 

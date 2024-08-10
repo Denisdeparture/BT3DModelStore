@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public class UserJwtContract 
+    public class ProductInBucketContract
     {
-        public string JwtToken { get; set; } = null!;
-        public User User { get; set; } = null!;
+        public string UserEmail { get; set; } = null!;
+        public ProductInBucket Product { get; set; } = null!;
     }
 }

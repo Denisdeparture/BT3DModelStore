@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using DomainModel;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+
 namespace Contracts
 {
     /// <summary>
@@ -7,10 +11,12 @@ namespace Contracts
     /// <typeparam name="T"> what model should I lead to</typeparam>
     public class ProductContractModel
     {
+        public int id { get; set; }
         public int Quantity { get; set; }
         public double Price { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public IFormFile Model { get; set; } = null!;
+        public FormFile File { get; set; } = null!;
+       
     }
 }

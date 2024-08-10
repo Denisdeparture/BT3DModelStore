@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public class DeleteProductContracts
-    {
-        public int Id { get; set; } 
-        public string? NameOfFile { get; set; } 
-    }
+    public record ChangeEmailContract(string oldemail, string newemail);
+   
 }

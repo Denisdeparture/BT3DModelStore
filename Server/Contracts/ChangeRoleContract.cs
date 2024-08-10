@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public class DeleteProductContracts
+    public class ChangeRoleContract
     {
-        public int Id { get; set; } 
-        public string? NameOfFile { get; set; } 
+        public string? Email { get; set; }
+        public string? Role { get; set; }
     }
 }

@@ -48,5 +48,8 @@
       "applicationUrl": "http://localhost:12341",
       "sslPort": 44351
     }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=127.0.0.1;Port=5432;Database=postgresRU;Username=postgresRU;Password=rtps"
   }
 }

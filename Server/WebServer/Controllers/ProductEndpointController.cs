@@ -16,7 +16,8 @@ namespace WebServer.Controllers
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
         private readonly IProductOperation _productOperation;
-        public ProductEndpointController( IServiceProvider serviceProvider,IProductOperation productOperation,  IConfiguration configuration, ILogger<Program> logger)
+
+        public ProductEndpointController( IServiceProvider serviceProvider,IProductOperation productOperation, IConfiguration configuration, ILogger<Program> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -37,10 +38,17 @@ namespace WebServer.Controllers
         public IResult GetProductById([FromQuery] int id)
         {
             if (id <= -1) return Results.BadRequest();
-            var product = _productOperation.GetAllProducts().FirstOrDefault(p => p.Id == id);
+            var product = _productOperation.GetById(id);
             if(product is null) return Results.NotFound();
             return Results.Json(product);
-
+        }
+        [HttpGet("/ProductEndpoint/GetProductByName")]
+        public IResult GetProductByName([FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return Results.BadRequest();
+            var product = _productOperation.GetByName(name);
+            if (product is null || product.ToList().Count == 0) return Results.NotFound();
+            return Results.Json(product);
         }
     }
 }

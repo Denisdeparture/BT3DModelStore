@@ -1,4 +1,4 @@
-﻿using DomainModel;
+﻿using DomainModel.Entity;
 using Microsoft.AspNetCore.Identity;
 using Endpoint = BuisnesLogic.Model.DeserializationModels.EndPoint;
 namespace Application.Models.ViewModels

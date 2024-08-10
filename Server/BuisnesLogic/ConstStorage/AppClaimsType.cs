@@ -13,5 +13,6 @@ namespace BuisnesLogic.ConstStorage
         public const string FirstVisit = nameof(FirstVisit);
         public const string LastVisit = nameof(LastVisit);
         public const string NickName = nameof(NickName);
+        public const string Login = "login";
     }
 }

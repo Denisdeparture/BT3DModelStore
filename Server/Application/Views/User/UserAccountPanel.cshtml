@@ -17,29 +17,33 @@
         {
             <p>Фамилия отчество: @Model.About.LastName</p>
         }
-      <p>Последнее посещение: @Model.About.LastVisit.Date </p>
+      <p>Последнее посещение: @DateTime.Now </p>
       <p>Зарегистирован в: @Model.About.FirstVisit.Date</p>
         @if (!string.IsNullOrWhiteSpace(@Model.About.PhoneNumber))
         {
             <p>Номер телефона: @Model.About.PhoneNumber</p>
-            <form method="post">
-                <button type="submit">Изменить</button>
+            <form method="post" asp-action="@EndpointValueInStringStorage.ChangePhoneNumberAction" asp-controller="@EndpointValueInStringStorage.UserController">
+                <label id="phoneNumber">Изменить</label>
+                <input id="phoneNumber" type="tel" name="phoneNumber" required />
+                <button type="submit">Принять</button>
             </form>
         }
         else
         {
-            <form>
-                <label id="phone">Добавить номер телефона</label>
-                <input id="phone" type="tel" required/>
+            <form method="post" asp-action="@EndpointValueInStringStorage.ChangePhoneNumberAction" asp-controller="@EndpointValueInStringStorage.UserController">
+                <label id="phoneNumber">Добавить номер телефона</label>
+                <input id="phoneNumber" type="tel" name="phoneNumber" required/>
                 <button type="submit">Принять</button>
             </form>
         }
-
+        <a href="@(Url.Action("Bucket", "Main", new {Model.About.Email}))" >К корзине товаров</a>
 
         @if (!string.IsNullOrWhiteSpace(@Model.About.Email))
         {
             <p>Электронная почта: @Model.About.Email</p>
-            <form method="post">
+            <form method="post" asp-action="@EndpointValueInStringStorage.ChangeEmailAction" asp-controller="@EndpointValueInStringStorage.UserController">
+                <input id="em" type="email" required max="40" name="newemail"/>
+                <label id="em">Введите новый email</label>
                 <button type="submit">Изменить</button>
             </form>
         }

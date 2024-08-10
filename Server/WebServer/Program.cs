@@ -1,5 +1,4 @@
 using BuisnesLogic.Extensions;
-using DomainModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,19 +10,22 @@ using Microsoft.Extensions.DependencyInjection;
 using BuisnesLogic.Service.Managers;
 using Infrastructure;
 using WebServer.RealizationInterface;
+using Contracts;
+using Microsoft.Extensions.Configuration;
+using DomainModel.Entity;
 namespace WebServer
 {
     public class Program
     {
+        // не забудь сделать миграцию
         public static void Main(string[] args)
         {
           
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration.AddPantryStorage("11386f7e-195b-4cfe-9e09-081010a4a279", "PantryStorage");
-            builder.Services.AddControllers();
             builder.Services.AddDbContext<MainDbContext>(opt =>
             {
-                opt.UseNpgsql(builder.Configuration["ConnectionStrings:DatabaseConnect"]);
+                 opt.UseNpgsql(builder.Configuration["ConnectionStrings:DatabaseConnect"]);
             });
             builder.Services.AddCors(opt =>
             {
@@ -35,14 +37,17 @@ namespace WebServer
 
                 });
             });
+            builder.Services.AddControllers();
             builder.Services.AddYandexCloud(builder.Configuration);
             builder.Services.AddJwtManager();
             builder.Services.AddMyValidations();
-            builder.Services.AddTransient<IProductOperation, ProductOperation>();
+            builder.Services.AddScoped<IProductOperation, ProductOperation>();
             builder.Services.AddTransient<IRoleOperation, RolesOperation>();
             builder.Services.AddTransient<IUsersRolesOperation, RolesOperation>();
             builder.Services.AddTransient<IUserOperation, UserOperation>();
+            builder.Services.AddTransient<IBucketOperation, BucketOperation>();
             builder.Services.AddKafkaClient<User>(builder.Configuration);
+            builder.Services.AddKafkaClient<ProductContractModelJson>(builder.Configuration);
             builder.Services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -69,8 +74,7 @@ namespace WebServer
             }).AddEntityFrameworkStores<MainDbContext>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddHostedService<RegistrationService>();
-            
+            builder.Services.AddHostedService<ProductOperationService>();
             var app = builder.Build();
             if (app.Environment.IsDevelopment())
             {

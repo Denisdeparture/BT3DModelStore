@@ -1,7 +1,6 @@
 using BuisnesLogic.Extensions;
 using BuisnesLogic.Service;
 using BuisnesLogic.ServicesInterface;
-using DomainModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +8,7 @@ using DataBase.AppDbContexts;
 using BuisnesLogic.Service.Clients;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BuisnesLogic.Service.Managers;
+using DomainModel.Entity;
 namespace ApplicationInfrastructure
 {
     public class Program
@@ -59,6 +59,7 @@ namespace ApplicationInfrastructure
             builder.Services.AddMyValidations();
             builder.Services.AddKafkaClient<User>(builder.Configuration);
             builder.Services.AddJwtManager();
+            builder.Services.AddSmtpClient(builder.Configuration);
             var app = builder.Build();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -66,7 +67,10 @@ namespace ApplicationInfrastructure
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseCookiePolicy(new CookiePolicyOptions()
+            {
+                MinimumSameSitePolicy = SameSiteMode.None
+            });
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Main}/{action=Catalog}");

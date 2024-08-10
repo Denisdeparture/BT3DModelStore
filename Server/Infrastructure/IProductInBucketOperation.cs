@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructure
 {
-    internal interface IAuthorization
+    public interface IProductInBucketOperation
     {
-        public void Login(User user);
-        public void Logout();
+        public void IncreaseCount(User user,int id);
+        public void DecreaseCount(User user, int id);
     }
 }

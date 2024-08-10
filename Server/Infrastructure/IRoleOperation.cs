@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Infrastructure.ModelResult;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Infrastructure
 {
     public interface IRoleOperation
     {
-        public Task<bool> CreateRole(string name);
-        public Task<bool> DeleteRole(string name);
+        public Task<RoleOperationModel> CreateRole(string name);
+        public Task<RoleOperationModel> DeleteRole(string name);
     }
 }

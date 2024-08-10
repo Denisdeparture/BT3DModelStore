@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Infrastructure
 {
-    public interface IDeleteUserOperation
+    public interface IUsersRolesOperation
     {
-        public Task<UserOperationModel> Delete(string id);
+        public Task<RoleOperationModel> AddRoleFromUserAsync(string email, string role);
     }
 }

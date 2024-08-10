@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DomainModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,6 +15,11 @@ using BuisnesLogic.Service;
 using System.Text.Json;
 using Contracts;
 using BuisnesLogic.ConstStorage;
+using BuisnesLogic.Extensions;
+using DomainModel.Entity;
+using Newtonsoft.Json.Linq;
+using MimeKit;
+using BuisnesLogic.Model;
 namespace Application.Controllers
 {
     public partial class AccountController : Controller
@@ -25,8 +29,9 @@ namespace Application.Controllers
         private readonly IConfiguration _configuration;
         private readonly IStrategyValidation _validator;
         private readonly IProduceClient<User> _messageBroker;
+        private readonly ISender _notification;
         private readonly JwtManager _jwtManager;
-        public AccountController(ILogger<Program> logger, SignInManager<User> signInManager, IConfiguration configuration, IStrategyValidation validation, IMessageBrokerClient<User> messageBroker, JwtManager jwtManager)
+        public AccountController(ILogger<Program> logger, SignInManager<User> signInManager, IConfiguration configuration, IStrategyValidation validation, IMessageBrokerClient<User> messageBroker, JwtManager jwtManager, ISender notification)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
@@ -34,20 +39,28 @@ namespace Application.Controllers
             _validator = validation ?? throw new ArgumentNullException(nameof(validation));
             _messageBroker = messageBroker ?? throw new ArgumentNullException(nameof(messageBroker));
             _jwtManager = jwtManager ?? throw new ArgumentNullException(nameof(jwtManager));
+            _notification = notification ?? throw new ArgumentNullException(nameof(notification));
         }
         [HttpGet]
         [ActionName("Login")]
-        public async Task<IActionResult> LoginGet(string returnurl)
+        public async Task<IActionResult> LoginGet()
         {
-            return View(new LoginViewModel() { genericDatas = await _signInManager.GetExternalAuthenticationSchemesAsync(), ReturnUrl = returnurl });
+            return View(new LoginViewModel() { genericDatas = await _signInManager.GetExternalAuthenticationSchemesAsync() });
         }
         [HttpPost]
         [ActionName("Login")]
         public async Task<IActionResult> LoginPost([FromForm] LoginViewModel loginmodel)
         {
+            var isvalid = _validator.StrategyCondition(new List<Predicate<LoginViewModel>>() 
+            {
+                (pw) => !string.IsNullOrEmpty(pw.Mail),
+                (pw) => !string.IsNullOrEmpty(pw.Password),
+            }, loginmodel);
+            if (!isvalid) return View(loginmodel);
             var mapper = new Mapper(new MapperConfiguration(cfg => cfg.CreateMap<LoginViewModel, User>()
                   .ForMember("Email", opt => opt.MapFrom(o => o.Mail))
-                  .ForMember("PasswordHash", opt => opt.MapFrom(src => src.Password))));
+                  .ForMember("PasswordHash", opt => opt.MapFrom(src => src.Password))
+                  ));
             var usermap = mapper.Map<User>(loginmodel);
             using (HttpClient client = new HttpClient())
             {
@@ -65,10 +78,10 @@ namespace Application.Controllers
                 return Redirect(Url.Action(EndpointValueInStringStorage.CatalogAction, EndpointValueInStringStorage.MainController)!);
             }
         }
-        public IActionResult ProviderAuthentication(string provider, string returnurl)
+        public IActionResult ProviderAuthentication(string provider)
         {
             const string actionForRedirect = nameof(ProviderAuthenticationCallback);
-            var actionUrlFormRedirect = Url.Action(actionForRedirect, EndpointValueInStringStorage.AccountContoller, returnurl);
+            var actionUrlFormRedirect = Url.Action(actionForRedirect, EndpointValueInStringStorage.AccountContoller, EndpointValueInStringStorage.MainController);
             var prop = _signInManager.ConfigureExternalAuthenticationProperties(provider, actionUrlFormRedirect);
             return Challenge(prop, provider);
         }
@@ -86,26 +99,57 @@ namespace Application.Controllers
         }
         [HttpGet]
         [ActionName("Registration")]
-        public async Task<IActionResult> RegistrationGet([FromQuery] RegisterViewModel registermodel)
+        public IActionResult RegistrationGet([FromQuery] RegisterViewModel registermodel)
         {
-            const string nameResultAction = "Catalog";
-            const string nameResultController = "Main";
             if (registermodel.Mail != null & registermodel.Password != null)
             {
                 registermodel.Name = (string.IsNullOrEmpty(registermodel.Name)) ? registermodel.Mail : registermodel.Name;
-                return await RegisterFromMessageBroker(registermodel, (nameResultAction, nameResultController));
+                var url = Url.Action(EndpointValueInStringStorage.ConfirmEmailAction, EndpointValueInStringStorage.AccountContoller, registermodel);
+                return Redirect(url!);
             }
             return View();
         }
         [HttpPost]
         [ActionName("Registration")]
-        public async Task<IActionResult> RegistrationPost([FromForm] RegisterViewModel registermodel)
+        public IActionResult RegistrationPost([FromForm] RegisterViewModel registermodel)
         {
             if (!ModelState.IsValid)
             {
                 return View(registermodel);
             }
-            return await RegisterFromMessageBroker(registermodel, (EndpointValueInStringStorage.CatalogAction, EndpointValueInStringStorage.MainController));
+            return RedirectToAction(EndpointValueInStringStorage.ConfirmEmailAction, EndpointValueInStringStorage.AccountContoller,  registermodel );
+        }
+        [HttpGet]
+        [ActionName("ConfirmationEmail")]
+        public IActionResult ConfirmationEmailGet([FromQuery]RegisterViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Mail)) return BadRequest();
+            var provider = model.Mail!.Substring(model.Mail.IndexOf('@') + 1, model.Mail.LastIndexOf('.') - model.Mail.IndexOf('@') - 1);
+            string code = string.Empty;
+            switch (provider)
+            {
+                case "yandex":
+                    code = SendCodeInMessage(SmtpConfigs.GetConfigs(model.Mail!).YANDEX);
+                    break;
+                case "gmail":
+                    code = SendCodeInMessage(SmtpConfigs.GetConfigs(model.Mail!).GMAIL);
+                    break;
+                case "mail":
+                    code = SendCodeInMessage(SmtpConfigs.GetConfigs(model.Mail!).Mail);
+                    break;
+                default:
+                    return BadRequest();
+            }
+            return View(new ConfirmViewModel() { Code = code, model = model});
+        }
+        [HttpPost]
+        [ActionName("ConfirmationEmail")]
+        public IActionResult ConfirmationEmailPost([FromQuery]RegisterViewModel model)
+        {
+            if(model is null) return BadRequest();
+            var res = Register(model, EndpointValueInStringStorage.CatalogAction);
+            res.Wait();
+            return res.Result;
         }
         public async Task<IActionResult> Logout()
         {
@@ -120,29 +164,32 @@ namespace Application.Controllers
         private async Task<HttpResponseMessage> GetResponsed(HttpClient client, string Action, User data)
         {
             
-            var baseuri = string.Format(string.Format("{0}://{1}", _configuration["ServerPath:Protocol"]!, _configuration["ServerPath:Host"]));
-            var path = baseuri + Url.Action(Action, EndpointValueInStringStorage.AccountControllerWithWebServer, new {data.Email, data.PasswordHash, data.UserNickName});
+            var baseuri = _configuration.GetServerAddres();
+            var path = baseuri + Url.Action(Action, EndpointValueInStringStorage.AccountControllerWithWebServer, new {data.Email, data.PasswordHash, data.UserNickName, data.SaltForPassword});
             var resp = await client.GetAsync(path);
             return resp;
         }
-        
-        private async Task<IActionResult> RegisterFromMessageBroker(RegisterViewModel registermodel, (string mainexitaction, string controller) infoForRedirect, string? topic = null)
+        private async Task<IActionResult> Register(RegisterViewModel registermodel, string mainexitaction)
         {
             var usermap = MappingRegisterModelFromUser(registermodel);
-            var cts = new CancellationTokenSource();
-            var res = await _messageBroker.Produce(usermap, cts, topic);
-            if (!res.Success)
-            { 
-                _logger.LogError(DateTime.UtcNow + Environment.NewLine + this.ToString() + Environment.NewLine + res.ErrorDescription); 
-                return BadRequest();
-            }
-            var token = JwtCreator.CreateTokenAsync(usermap, _jwtManager);
-            var info = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            await _signInManager.SignInWithClaimsAsync(usermap, new AuthenticationProperties()
+            if (usermap is null) return BadRequest();
+            using (var client = new HttpClient())
             {
-                ExpiresUtc = info.ValidTo
-            }, info.Claims);
-            return Redirect(Url.Action(infoForRedirect.mainexitaction, infoForRedirect.controller)!);
+                var resp = await GetResponsed(client, EndpointValueInStringStorage.RegistrationAction, usermap);
+                var token = await resp.Content.ReadAsStringAsync();
+                if (resp.StatusCode != HttpStatusCode.OK | string.IsNullOrEmpty(token))
+                {
+                    return BadRequest();
+                }
+                var info = new JwtSecurityTokenHandler().ReadJwtToken(token);
+                await _signInManager.SignInWithClaimsAsync(usermap, new AuthenticationProperties()
+                {
+                    ExpiresUtc = info.ValidTo
+                }, info.Claims);
+                var redirectUrl = Url.Action(mainexitaction, EndpointValueInStringStorage.MainController);
+                return Redirect(redirectUrl!);
+
+            }
         }
         private User MappingRegisterModelFromUser(RegisterViewModel model)
         {
@@ -152,9 +199,22 @@ namespace Application.Controllers
                   .ForMember("UserNickName", opt => opt.MapFrom(src => src.Name))
                   .ForMember("LastName", opt => opt.MapFrom(src => src.LastName ?? string.Empty)))); 
             var usermap = mapper.Map<User>(model);
+            var passwordInfo = usermap.PasswordHash!.EncryptPassword(28);
+            usermap.PasswordHash = passwordInfo.passwordhash;
+            usermap.SaltForPassword = passwordInfo.salt;
             return usermap;
         }
-       
+        private string SendCodeInMessage(SmtpMessageModel model)
+        {
+            string code = string.Join("", (Enumerable.Range(0, 5).Select(r => r = new Random().Next(0, 9))).Select(num => num.ToString()));
+            var msg = new MimeMessage()
+            {
+                Subject = "Ваш код подтверждения",
+                Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = $"{code}" },
+            };
+            _notification.SendMailSmtp(msg, model);
+            return code;
+        }
     }
 }
 

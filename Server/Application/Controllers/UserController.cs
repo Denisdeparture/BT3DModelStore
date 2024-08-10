@@ -1,10 +1,15 @@
 ﻿using Application.Models.ViewModels;
 using BuisnesLogic.ConstStorage;
-using DomainModel;
+using BuisnesLogic.Extensions;
+using Contracts;
+using DomainModel.Entity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -15,18 +20,20 @@ namespace Application.Controllers
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserController> _logger;
         private readonly UserManager<User> _userManager;
-        public UserController(IConfiguration configuration, ILogger<UserController> logger, UserManager<User> userManager)
+        private readonly SignInManager<User> _signInManager;
+        public UserController(IConfiguration configuration, ILogger<UserController> logger, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _configuration = configuration;
             _logger = logger;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
         [Authorize]
         [HttpGet("/User/UserAccountPanel/{email}")]
         public async Task<IActionResult> UserAccountPanel(string email)
         {
             var action = Url.Action(EndpointValueInStringStorage.UserInfoActionInWebServer, EndpointValueInStringStorage.AccountControllerWithWebServer, new {email});
-            var baseuri = string.Format(string.Format("{0}://{1}", _configuration["ServerPath:Protocol"]!, _configuration["ServerPath:Host"]));
+            var baseuri = _configuration.GetServerAddres();
             User? dataUser = null;
             using (var httpClient = new HttpClient())
             {
@@ -60,6 +67,42 @@ namespace Application.Controllers
                 
             };
             return View(EndpointValueInStringStorage.UserPanelAction,user);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ChangeEmail(string newemail)
+        {
+            if(string.IsNullOrWhiteSpace(newemail)) return BadRequest();
+            using(var httpClient = new HttpClient())
+            {
+
+                var contract = new ChangeEmailContract(User.FindFirstValue(ClaimTypes.Email)!, newemail);
+                var url = _configuration.GetServerAddres() + Url.Action(EndpointValueInStringStorage.ChangeEmailAction, EndpointValueInStringStorage.AccountControllerWithWebServer);
+                var res = await httpClient.PutAsJsonAsync<ChangeEmailContract>(url, contract);
+                if (!res.IsSuccessStatusCode) return BadRequest();
+                var userAndJwt = await res.Content.ReadFromJsonAsync<UserJwtContract>();
+                var info = new JwtSecurityTokenHandler().ReadJwtToken(userAndJwt!.JwtToken);
+                await _signInManager.SignOutAsync();
+                await _signInManager.SignInWithClaimsAsync(userAndJwt.User, new AuthenticationProperties()
+                {
+                    ExpiresUtc = info.ValidTo
+                }, info.Claims);
+                return Redirect(Url.Action(EndpointValueInStringStorage.UserPanelAction,EndpointValueInStringStorage.UserController) + $"/{userAndJwt.User.Email}");
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> ChangePhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber)) return BadRequest();
+            using(var httpClient = new HttpClient())
+            {
+                var email = User.FindFirstValue(ClaimTypes.Email)!;
+                var contract = new ChangePhoneNumberContract(email, phoneNumber);
+                var url = _configuration.GetServerAddres() + Url.Action(EndpointValueInStringStorage.ChangePhoneNumberAction, EndpointValueInStringStorage.AccountControllerWithWebServer);
+                var res = await httpClient.PutAsJsonAsync<ChangePhoneNumberContract>(url, contract);
+                if (!res.IsSuccessStatusCode) return BadRequest();
+                return Redirect(Url.Action(EndpointValueInStringStorage.UserPanelAction, EndpointValueInStringStorage.UserController) + $"/{email}");
+
+            }
         }
     }
 }

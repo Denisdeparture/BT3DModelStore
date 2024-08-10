@@ -1,0 +1,17 @@
+﻿@using Application.Models.ViewModels
+@model ConfirmViewModel
+<link rel="stylesheet" href="~/css/ConfirmationEmail.css" type="text/css" />
+<div class="main">
+    <div class="container">
+        <div id="env" hidden><p>@Model.Code</p></div>
+        <h1>Подтверждение почты</h1>
+        <p>На указанную вами почту придёт код</p>
+        <label for="code">Введите код</label>
+        <input id="code" type="number" required />
+        <form method="post" href="@(Url.ActionLink(EndpointValueInStringStorage.ConfirmEmailAction, EndpointValueInStringStorage.AccountContoller, new{ LastName = Model.model.LastName, Mail = Model.model.Mail, Name = Model.model.Name, Password = Model.model.Password, PasswordConfirm = Model.model.PasswordConfirm}))">
+            <button type="submit" class="button-confirm">Принять</button>
+        </form>
+        <p>Не пришёл код:</p>
+        <a asp-action="ConfirmationEmail" asp-controller="Account">Отправить повторно</a>
+    </div>
+</div>

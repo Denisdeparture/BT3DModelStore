@@ -1,0 +1,37 @@
+﻿@using DomainModel.Entity
+@model IEnumerable<Product>
+<link rel="stylesheet" href="~/css/AdminAllProductsPage.css" type="text/css" />
+<div class="container">
+    <form method="get" asp-action="@EndpointValueInStringStorage.AdminAction" asp-controller="@EndpointValueInStringStorage.AdminController">
+        <button class="back" type="submit">Назад</button>
+    </form>
+    <h1>Все продукты</h1>
+    <div id="table-scroll" class="table-scroll">
+        <div class="table-wrap">
+            <table class="main-table">
+                <thead>
+                    <tr>
+                        <th class="fixed-side" scope="col">Id</th>
+                        <td scope="col">Имя</td>
+                        <td scope="col">Цена</td>
+                        <td scope="col">Старая цена</td>
+                        <td scope="col">Url</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                    <tr>
+                        <th class="fixed-side">@product.Id</th>
+                        <td>@product.Name</td>
+                        <td>@product.Price</td>
+                        <td>@product.OldPrice</td>
+                        <td>@product.Url</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

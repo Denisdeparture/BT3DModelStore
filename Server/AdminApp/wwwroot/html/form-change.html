@@ -1,0 +1,15 @@
+﻿<form class="function" method="post" action="http://localhost:5000/AdminOperation/UpdateProduct" enctype="multipart/form-data">
+    <label for="Name">Введите Id продукта </label>
+    <input id="Name" required type="text" name="Id" />
+    <label for="Name">Введите новое название</label>
+    <input id="Name" required type="text" name="Name" />
+    <label for="Des"> Измените описание </label>
+    <input id="Des" required type="text" name="Description" />
+    <label for="Col"> Измините количество </label>
+    <input id="Col" required type="number" name="Quantity" />
+    <label for="Price"> Измените цену </label>
+    <input id="Price" required type="number" name="Price" />
+    <label for="Model"> Добавьте новую модель в формате glb </label>
+    <input id="Model" required type="file" accept=".glb" name="Model" />
+    <button type="submit">Принять</button>
+</form>

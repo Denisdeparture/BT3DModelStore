@@ -1,6 +1,5 @@
 ﻿using BuisnesLogic.ServicesInterface;
 using Infrastructure;
-using DomainModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +10,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text.Json;
 using BuisnesLogic.Model.Roles;
+using DomainModel.Entity;
+using BuisnesLogic.Extensions;
+using System.Net.Http;
+using System.Data;
 namespace Application.Controllers
 {
     public partial class AdminController : Controller
@@ -55,12 +58,39 @@ namespace Application.Controllers
                 _logger.LogError(error);
                 return BadRequest();
             }
-            var roles = await _userManager.GetRolesAsync(dataUser) ?? throw new NullReferenceException();
-            var isAdmin = roles.FirstOrDefault(r => r == RolesType.Admin.ToString());
-            if(string.IsNullOrEmpty(isAdmin)) return Unauthorized();
+            if(!IsAdmin(dataUser)) return Unauthorized();
             return View();
         }
-       
+        [HttpGet("/Admin/AllProducts")]
+        public async Task<IActionResult> AllProducts()
+        {
+            using (var httpclient = new HttpClient())
+            {
+                string endpoint = Url.Action("GetAllProducts", "ProductEndpoint")!;
+                string url = _configuration.GetServerAddres() + endpoint;
+                _logger.LogInformation(url);
+               
+                try
+                {
+                    var allProducts = await httpclient.GetFromJsonAsync<IEnumerable<Product>>(url);
+                    return View(allProducts);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message + Environment.NewLine + ex.StackTrace + Environment.NewLine + this.ToString());
+                    return BadRequest();
+                }
+            }
+        }
+        private bool IsAdmin(User user)
+        {
+            var task =  _userManager.GetRolesAsync(user) ?? throw new NullReferenceException();
+            task.Wait();
+            var roles = task.Result;
+            var isAdmin = roles.FirstOrDefault(r => r == RolesType.Admin.ToString());
+            if (string.IsNullOrEmpty(isAdmin)) return false;
+            return true;
+        }
     }
     
 }

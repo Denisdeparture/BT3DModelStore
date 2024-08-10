@@ -1,13 +1,13 @@
-﻿<form class="function" method = "post" action="http://host.docker.internal:5000/AdminOperation/AddProduct" enctype = "multipart/form-data" >
+﻿<form class="function" method="post" action="http://localhost:5000/AdminOperation/AddProduct" enctype="multipart/form-data" >
         <label for="Name" > Введите название </label>
-        <input id="Name" type = "text" name="Name"/>
-        <label for="Des" > Добавьте описание </label>
-        <input id="Des" type = "text" name= "Description"/>
-        <label for= "Col" > Введите количество </ label >
-        <input id ="Col" type = "number" name= "Quantity" />
-        <label for="Price" > Введите цену </ label >
-        <input id="Price" type = "number" name="Price"/>
+        <input id="Name" type = "text" name="Name" required/>
+        <label for="Des"  > Добавьте описание </label>
+        <input id="Des" required type = "text" name= "Description"/>
+        <label for= "Col" > Введите количество </label>
+        <input id ="Col" required type = "number" name="Quantity" />
+        <label for="Price" > Введите цену </label>
+        <input id="Price" required type = "number" name="Price"/>
         <label for="Model" > Добавьте модель в формате glb </label>
-        <input id="Model" type="file" accept=".glb" name="Model"/>
+        <input id="Model" required type="file" accept=".glb" name="Model"/>
         <button type = "submit"> Принять </button >
 </form>

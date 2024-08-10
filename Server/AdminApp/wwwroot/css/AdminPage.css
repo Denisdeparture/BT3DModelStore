@@ -27,7 +27,11 @@ body {
     right: 2%;
     bottom: 1em;
 }
-
+.main {
+    overflow-x: hidden;
+    -webkit-line-clamp: 2;
+    word-break: break-all;
+}
 .button_opt button {
      width: 80px;
      height: 80px;
@@ -39,26 +43,25 @@ body {
 }
 
 .view-info {
-    position: relative;
-    left: 50%;
-    bottom: 10em;
+    
+    margin-left: 50%;
+    margin-bottom: 10em;
 }
 
 .view-info p {
      font-size: 30px;
 }
-.function button{
-       display: block;
-       margin-top: 20px;
-       font-size: 20px;
-       border-color: white;
-       border-radius: 5px;
-       background: rgb(238,174,235);
-       background: radial-gradient(circle, rgba(238,174,235,1) 26%, rgba(96,129,226,1) 95%);
+.function button {
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #3f93ff;
+    border: none;
+    color: white;
 }
 function button :hover {
-    background: rgb(242, 230, 242);
-    background: radial-gradient(circle, rgba(242, 230, 242,1) 26%, rgba(96,129,226,1) 95%);
+    background-color: #3985e6;
 }
 .function label, .function input {
       display: block;

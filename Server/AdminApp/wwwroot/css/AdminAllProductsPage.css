@@ -1,0 +1,130 @@
+﻿.table-scroll {
+    max-width: 900px;
+    margin-left: 30%;
+    border: 1px solid #000;
+}
+
+h1 {
+    text-align: center;
+}
+
+.back {
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #3f93ff;
+    border: none;
+    color: white;
+}
+
+.container {
+    border: solid, 1px;
+    border-color: rgb(230, 204, 209);
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    background-color: white;
+    padding: 1%;
+}
+
+body {
+    background-color: rgb(235, 206, 211);
+}
+
+.table-wrap {
+    width: 100%;
+    overflow: auto;
+}
+
+.table-scroll table {
+    width: 100%;
+    margin: auto;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-scroll th,
+.table-scroll td {
+    padding: 5px 10px;
+    border: 1px solid #000;
+    white-space: nowrap;
+    vertical-align: top;
+}
+
+.table-scroll thead,
+.table-scroll tfoot {
+    background: #f9f9f9;
+}
+
+.clone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+    .clone th,
+    .clone td {
+        visibility: hidden;
+    }
+
+    .clone td,
+    .clone th {
+        border-color: transparent;
+    }
+
+    .clone tbody th {
+        visibility: visible;
+        color: red;
+    }
+
+    .clone th.fixed-side {
+        border: 1px solid #000;
+        background: #eee;
+        visibility: visible;
+    }
+
+    .clone tr:hover th.fixed-side {
+        background: pink;
+    }
+
+    .clone thead,
+    .clone tfoot {
+        background: transparent;
+    }
+
+/*hover colors for indication*/
+table.main-table td,
+table.main-table th {
+    position: relative;
+}
+
+table.main-table tbody tr:hover {
+    background-color: pink;
+}
+
+table.main-table td:hover::after,
+table.main-table thead th:not(:empty):hover::after,
+table.main-table td:focus::after,
+table.main-table thead th:not(:empty):focus::after {
+    content: '';
+    height: 5000px;
+    left: 0;
+    position: absolute;
+    top: -5000px;
+    width: 100%;
+    z-index: -1;
+}
+
+table.main-table td:hover::after,
+table.main-table th:hover::after {
+    background-color: pink;
+}
+
+table.main-table td:focus::after,
+table.main-table th:focus::after {
+    background-color: lightblue;
+}

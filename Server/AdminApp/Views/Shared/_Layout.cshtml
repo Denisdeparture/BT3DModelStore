@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/LayerStyles.css" asp-append-version="true" />
 </head>
@@ -10,22 +9,33 @@
     <header>
         <nav>
             <ul>
-                <li><a asp-area="" asp-controller="" asp-action="">контакты</a></li>
-                <li><a asp-area="" asp-controller="" asp-action="">доставка</a></li>
-                <li><a asp-area="" asp-controller="" asp-action="">оплата</a></li>
+                <li><a asp-area="" asp-controller="SiteInfo" asp-action="Contacts">контакты</a></li>
+                <li><a asp-area="" asp-controller="SiteInfo" asp-action="Delivery">доставка</a></li>
+                <li><a asp-area="" asp-controller="SiteInfo" asp-action="Payment">оплата</a></li>
+                @if(!User.Identity!.IsAuthenticated)
+                {
+                    <form method="get" class="Login-form" asp-controller="Account" asp-action="Login">
+                        <p>Войти</p>
+                        <button type="submit"><img src="~/assets/login.png" height="50" width="50" /></button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-action="@EndpointValueInStringStorage.UserPanelAction" asp-controller="@EndpointValueInStringStorage.UserController" asp-route-email="@User.FindFirst(ClaimTypes.Email)!.Value">@User.FindFirstValue(AppClaimsType.NickName)</a>
+                }
             </ul>
         </nav>
     </header>
 
-    <div class="container">
+    <div class="container_layout">
         <main role="main">
             @RenderBody()
         </main>
     </div>
     <footer>
         <ul>
-            <li><a asp-area="" asp-controller="" asp-action="">О нас</a></li>
-            <li>Номер тех поддержки: </li>
+            <li><a asp-area="" asp-controller="SiteInfo" asp-action="About">О нас</a></li>
+            <li>Номер тех поддержки: +79957877043 </li>
         </ul>
     </footer>
 </body>

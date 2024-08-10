@@ -1,7 +1,7 @@
 using BuisnesLogic.Extensions;
 using BuisnesLogic.Service.Managers;
 using DataBase.AppDbContexts;
-using DomainModel;
+using DomainModel.Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
@@ -20,8 +20,8 @@ namespace AdminApp
             builder.Services.AddAuthentication();
             builder.Services.ConfigureApplicationCookie(opt =>
             {
-                opt.LoginPath = "/Admin/Login";
-                opt.LogoutPath = "/Admin/Logout";
+                opt.LoginPath = "/Account/Login";
+                opt.LogoutPath = "/Account/Logout";
             });
             builder.Services.AddIdentity<User, IdentityRole>(delegate (IdentityOptions opt)
             {

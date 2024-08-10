@@ -1,0 +1,43 @@
+﻿@model Product
+
+<link href="~/css/Product.css" type="text/css" rel="stylesheet" />
+<script type="importmap">
+      {
+          "imports": {
+          "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.165.0/three.module.js"
+      }
+    }
+</script>
+<div class="main-box">
+    <div hidden id="test">@Model.Url</div>
+    <h1>@Model.Name</h1>
+    <div class="images-control" id="images-control">
+        <div class="canvas-container" id="canvas-container"></div>
+    </div>
+    <div class="info">
+        <ul>
+            <li><p>Цена: @Model.Price рублей</p></li>
+        </ul>
+    </div>
+    <div class="description">
+        <p>@Model.Description</p>
+    </div>
+    <div class="functional-button">
+        <form method="post" asp-action="Add" asp-controller="Main" asp-route-id="@Model.Id" asp-route-email="@User.FindFirstValue(ClaimTypes.Email)">
+            <button type="submit">В козину</button>
+        </form>
+        <form method="post" action="https://yoomoney.ru/quickpay/confirm.xml">
+            <input type="hidden" name="receiver" value="4100118697351249">
+            <input type="hidden" name="quickpay-form" value="shop">
+            <input type="hidden" name="targets" value="<%= order_id %>">
+            <input type="hidden" name="paymentType" value="AC">
+            <input type="hidden" name="sum" value="@Model.Price" data-type="number">
+            <input type="hidden" name="label" value="Оплата:<%= member_id %>">
+            <input type="hidden" name="formcomment" value="Creatium Demo: оплата покупки">
+            <input type="hidden" name="short-dest" value="Creatium Demo: оплата покупки">
+            <input type="hidden" name="successURL" value="@Configuration["ClientHostForRedirect"]">
+            <button type="submit">Купить в один клик</button>
+        </form>
+    </div>
+    <script src="~/js/Product.js" type="module"></script>
+</div>

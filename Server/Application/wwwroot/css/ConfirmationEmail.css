@@ -1,0 +1,46 @@
+﻿input {
+    display: block;
+    font-size: 20px;
+    border-color: white;
+    border-radius: 10px;
+}
+
+.button-confirm {
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #3f93ff;
+    border: none;
+    color: white;
+    margin: 5px;
+}
+
+    .button-confirm:hover {
+        background-color: #3985e6;
+    }
+
+label {
+    font-size: 30px;
+}
+
+.main {
+    margin-top: 10%;
+    border: solid;
+    width: 40%;
+    margin-left: 30%;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.container {
+    padding-left: 30%;
+}
+
+body {
+    background-color: rgb(235, 206, 211);
+}
+
+p {
+    font-size: 20px;
+}

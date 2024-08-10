@@ -26,6 +26,9 @@ body {
     border: none;
     color: white;
 }
+.back button:hover {
+    background-color: #3985e6;
+}
 .dev {
     list-style-type: none;
     display: flex;

@@ -1,0 +1,86 @@
+﻿.container {
+    border: solid, 1px;
+    border-color: rgb(230, 204, 209);
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 2px 17px 65px -12px rgba(0,0,0,0.75);
+    background-color: white;
+}
+
+body {
+    background-color: rgb(235, 206, 211);
+}
+
+.bucket-button {
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #3f93ff;
+    border: none;
+    color: white;
+    margin: 5px;
+}
+
+    .bucket-button:hover {
+        background-color: #3985e6;
+    }
+
+.list-product {
+    list-style-type: none;
+}
+
+.product {
+    margin-top: 1px;
+    background-color: rgb(247, 246, 240);
+    border: solid;
+    border-color: rgb(247, 246, 240);
+    border-radius: 10px;
+    padding: 1%;
+    -webkit-box-shadow: 13px 7px 19px 7px rgba(34, 60, 80, 0.21);
+    -moz-box-shadow: 13px 7px 19px 7px rgba(34, 60, 80, 0.21);
+    box-shadow: 13px 7px 19px 7px rgba(34, 60, 80, 0.21);
+}
+.add, remove{
+    font-size: 20px;
+}
+.name {
+    font-size: 18px;
+    font-style: italic;
+}
+
+.info p {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.control-product input {
+    -webkit-appearance: none;
+    border: none;
+    text-align: center;
+    width: 32px;
+    font-size: 16px;
+    color: #43484D;
+    font-weight: 300;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0; 
+}
+select {
+    font: inherit;
+    letter-spacing: inherit;
+    word-spacing: inherit;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 2px;
+}
+
+.result {
+    font-size: 20px;
+    font-weight: bold;
+}

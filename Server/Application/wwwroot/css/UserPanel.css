@@ -44,3 +44,7 @@ body {
     font-weight: bold;
 }
 
+.main-box p {
+    -webkit-line-clamp: 2;
+    word-break: break-all;
+}

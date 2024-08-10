@@ -20,5 +20,13 @@ namespace BuisnesLogic.ConstStorage
         public const string UserInfoActionInWebServer = "GetUserInfo";
         public const string UserController = "User";
         public const string ExitAction = "Logout";
+        public const string RedirectToBucket = "Bucket";
+        public const string ProductControllerWithWebServer = "ProductEndpoint";
+        public const string AllProductsAction = "GetAllProducts";
+        public const string ProductByIdAction = "GetProductById";
+        public const string ProductByNameAction = "GetProductByName";
+        public const string ChangeEmailAction = "ChangeEmail";
+        public const string ChangePhoneNumberAction = "ChangePhoneNumber";
+        public const string ConfirmEmailAction = "ConfirmationEmail";
     }
 }

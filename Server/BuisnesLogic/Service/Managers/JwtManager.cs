@@ -1,4 +1,5 @@
-﻿using DomainModel;
+﻿using BuisnesLogic.ConstStorage;
+using DomainModel.Entity;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -17,27 +18,31 @@ namespace BuisnesLogic.Service.Managers
         private readonly IConfiguration _configuration;
         public JwtManager(UserManager<User> usermanager, IConfiguration configuration)
         {
-            _userManager = usermanager;
-            _configuration = configuration;
+            _userManager = usermanager ?? throw new ArgumentNullException(nameof(usermanager));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
-        public async Task<JwtSecurityToken> CreateJwtTokenForUserAsync(User user)
+        public JwtSecurityToken CreateJwtTokenForUserAsync(User user)
         {
             var jwt = new JwtSecurityToken(issuer: _configuration["JwtSettings:Issuer"],
             audience: _configuration["JwtSettings:Audience"],
             expires: DateTime.Now.AddMinutes(double.Parse(_configuration["JwtSettings:ExpirationTimeInMinutes"]!)),
-            claims: await GetClaims(user),
+            claims: GetClaims(user),
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecurityKey"]!)), SecurityAlgorithms.HmacSha256)
             ); ;
             return jwt;
         }
-        private async Task<List<Claim>> GetClaims(User user)
+        private List<Claim> GetClaims(User user)
         {
             List<Claim> claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(AppClaimsType.NickName, user.UserNickName ?? string.Empty)
             };
-            foreach (var role in await _userManager.GetRolesAsync(user))
+            var task = _userManager.GetRolesAsync(user);
+            task.Wait();
+            var roles = task.Result;
+         //   if (roles.Count == 0) throw new NullReferenceException();
+            foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }

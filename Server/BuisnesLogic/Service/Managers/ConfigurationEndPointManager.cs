@@ -1,5 +1,5 @@
 ﻿using Amazon.Runtime.CredentialManagement;
-using BuisnesLogic.Models.SerializationModels;
+using BuisnesLogic.Model.DeserializationModels;
 using BuisnesLogic.ServicesInterface.ConfigurationEndPointsInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 namespace BuisnesLogic.Service.Managers
 {
-    public class ConfigurationEndPointManager<T> : IDeserializationConfigurationEndpoint<T>/*, IConfigurationEndpointOperation<T>*/ where T : EndPoint, new()
+    public class ConfigurationEndPointManager<T> : IDeserializationConfigurationEndpoint<T> where T : EndPoint, new()
     {
         private readonly IEnumerable<IConfigurationSection> elements;
         public ConfigurationEndPointManager(IConfiguration configuration, string mainconfigurationsection)
@@ -17,6 +17,7 @@ namespace BuisnesLogic.Service.Managers
         }
         public T GetInfoEndPoint(string nameEndpoint)
         {
+            if(string.IsNullOrEmpty(nameEndpoint)) throw new NullReferenceException(nameof(nameEndpoint));
             T info = new T();
             var section = elements.Where(x => x.Key.ToLower().Equals(nameEndpoint.ToLower())).SingleOrDefault();
             if (section is not null)

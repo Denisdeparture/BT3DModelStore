@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Html;
 
-namespace BuisnesLogic.Models.SerializationModels
+namespace BuisnesLogic.Model.DeserializationModels
 {
     public class AdminEndpointModel : EndPoint
     {

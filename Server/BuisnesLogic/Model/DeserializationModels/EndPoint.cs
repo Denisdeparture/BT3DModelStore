@@ -1,4 +1,4 @@
-﻿namespace BuisnesLogic.Models.SerializationModels
+﻿namespace BuisnesLogic.Model.DeserializationModels
 {
     public abstract class EndPoint
     {

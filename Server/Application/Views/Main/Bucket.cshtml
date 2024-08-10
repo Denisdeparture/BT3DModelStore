@@ -1,0 +1,56 @@
+﻿@model IEnumerable<ProductInBucket>
+@{
+    string? email = User.FindFirstValue(ClaimTypes.Email);
+    double allsum = Model.Select(p => p.Price).Sum();
+}
+<head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/css/Bucket.css" type="text/css" />
+</head>
+<div class="main">
+    <div class="container">
+        <form method="get" asp-action="Catalog" asp-controller="Main">
+            <button class="bucket-button" type="submit">Назад</button>
+        </form>
+        <ul class="list-product">
+            @foreach(var pr in Model)
+            {
+                <li class="product">
+                    <form method="post" action="@(Configuration.GetAlternativeServerAddres() + Url.Action("RemoveInBucket","BucketOperationendEndPoints", new {pr.ProductId, email}))">
+                         <button type="submit"><img src="../assets/trash_bucket.png" width="20" height="20"/></button>
+                     </form>
+                    <strong class="name">@pr.Name</strong>
+                    <hr>
+                    <div class="info">
+                        <p>@pr.Price </p>
+                        <p>@pr.OldPrice </p>
+                    </div>
+                    <div class="control-product">
+                        <form method="post" action="@(Configuration.GetAlternativeServerAddres() + Url.Action("Increase","BucketOperationendEndPoints", new {pr.ProductId, email}))">
+                           <button class="add" id="add" type="submit">+</button>
+                        </form>
+                            <input class="val" type="number" value="@pr.Count">
+                        <form method="post" action="@(Configuration.GetAlternativeServerAddres() + Url.Action("Decrease","BucketOperationendEndPoints", new {pr.ProductId, email}))">
+                            <button class="remove" id="remove" type="submit">-</button>
+                        </form>
+                    </div>
+                </li>
+            }
+        </ul>
+        <div class="bucket-button">
+            <form method="post" action="https://yoomoney.ru/quickpay/confirm.xml">
+                <input type="hidden" name="receiver" value="4100118697351249">
+                <input type="hidden" name="quickpay-form" value="shop">
+                <input type="hidden" name="targets" value="<%= order_id %>">
+                <input type="hidden" name="paymentType" value="AC">
+                <input type="hidden" name="sum" value="@allsum" data-type="number">
+                <input type="hidden" name="label" value="Оплата:<%= member_id %>">
+                <input type="hidden" name="formcomment" value="Creatium Demo: оплата покупки">
+                <input type="hidden" name="short-dest" value="Creatium Demo: оплата покупки">
+                <input type="hidden" name="successURL" value="@Configuration["ClientHostForRedirect"]">
+                <button type="submit">Оплатить</button>
+            </form>
+      </div>
+    </div>
+</div>
+<script type="module" href="~/js/Bucket.js"></script>

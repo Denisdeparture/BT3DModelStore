@@ -23,6 +23,7 @@ namespace BuisnesLogic.Service.Clients
         public string baseBucket { get; set; }
         public YandexCloudClient(string clientawsid, string clientawssecret, string basebucket)
         {
+            if(string.IsNullOrWhiteSpace(clientawsid) | string.IsNullOrWhiteSpace(clientawssecret) | string.IsNullOrWhiteSpace(basebucket)) throw new ArgumentNullException("args was null");
             var options = new CredentialProfileOptions()
             {
                 AccessKey = clientawsid,
@@ -43,6 +44,7 @@ namespace BuisnesLogic.Service.Clients
         /// <param name="postfix"> Is work from scheme basebacket + postfix</param>
         public async Task<AwsActionResultModel> AddModel(Stream file, string postfix, string nameofmodel)
         {
+            if (string.IsNullOrWhiteSpace(postfix) | string.IsNullOrWhiteSpace(nameofmodel)) throw new NullReferenceException("args was null");
             AwsActionResultModel model = new AwsActionResultModel() { resultUrlFromModel = null, isCorrect = false };
             using (var client = new AmazonS3Client(configurationAws))
             {
@@ -68,6 +70,7 @@ namespace BuisnesLogic.Service.Clients
         }
         public async Task<bool> DeleteModel(string postfix, string nameofmodel)
         {
+            if (string.IsNullOrWhiteSpace(postfix) | string.IsNullOrWhiteSpace(nameofmodel)) throw new NullReferenceException("args was null");
             using (var client = new AmazonS3Client(configurationAws))
             {
                 var conditionContinue = await Continue(client, baseBucket);
@@ -85,6 +88,7 @@ namespace BuisnesLogic.Service.Clients
         }
         public async Task<AwsActionResultModel> UpdateModel(Stream newfile, string postfix, string nameofmodel)
         {
+            if (string.IsNullOrWhiteSpace(postfix) | string.IsNullOrWhiteSpace(nameofmodel)) throw new NullReferenceException("args was null");
             AwsActionResultModel model = new AwsActionResultModel() { resultUrlFromModel = null, isCorrect = false };
             // Ну то есть тут 3 операции Get later Delete later Put
             using (var client = new AmazonS3Client(configurationAws))

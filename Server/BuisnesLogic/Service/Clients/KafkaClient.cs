@@ -1,12 +1,13 @@
 ﻿using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using BuisnesLogic.Model.ServiceResultModels;
 using BuisnesLogic.ServicesInterface.ClientsInterfaces.MessageBrokers;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
+using DomainModel;
 namespace BuisnesLogic.Service.Clients
 {
    
@@ -21,6 +22,7 @@ namespace BuisnesLogic.Service.Clients
         // Решение с int временное
         public KafkaClient(ILogger<KafkaClient<TModel>> logger, string host, string basetopic, string clientid = "webserverclient", string groupid = "consumerGroupTest")
         {
+            if(string.IsNullOrWhiteSpace(host) | string.IsNullOrWhiteSpace(basetopic) | string.IsNullOrWhiteSpace(clientid) | string.IsNullOrWhiteSpace(groupid)) throw new ArgumentNullException(nameof(host));
             _producerConf = new ProducerConfig()
             {
                 BootstrapServers = host,
@@ -33,16 +35,35 @@ namespace BuisnesLogic.Service.Clients
                 ClientId = clientid,
                 GroupId = groupid,
             };
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             BaseTopic = basetopic;
             Models = new ObservableCollection<TModel>();
         }
         public async Task<ProduceResultModel> Produce(TModel model, CancellationTokenSource cts, string? topic = null)
         {
+            if(model is null) throw new ArgumentNullException(nameof(model));
+            if (cts is null) throw new ArgumentNullException(nameof(cts));
+            string? json = null;
+            try
+            {
+                json = JsonConvert.SerializeObject(model);
+            }
+            catch(Exception ex)
+            {
+                string msg = "producer got this error: " + ex.Message + Environment.NewLine + ex.StackTrace;
+                _logger.LogError(msg);
+                return new ProduceResultModel() { Success = false, ErrorDescription = msg, Exception = ex };
+            }
+            if(string.IsNullOrEmpty(json))
+            {
+                string msg = "data convert to json was incorrect";
+                _logger.LogError(msg);
+                return new ProduceResultModel() { Success = false, ErrorDescription = msg};
+            }
             var message = new Message<string, string>()
             {
                 Key = new Guid().ToString(),
-                Value = JsonSerializer.Serialize(model)
+                Value = json
             };
             using (var producer = new ProducerBuilder<string, string>(_producerConf).SetKeySerializer(Serializers.Utf8).Build())
             {
@@ -59,8 +80,9 @@ namespace BuisnesLogic.Service.Clients
                 }
             }
         }
-        public void Consume(int consuming_time, CancellationTokenSource cts, string? topic = null)
+        public void Consume(uint consuming_time, CancellationTokenSource cts, string? topic = null)
         {
+
             using (var consumer = new ConsumerBuilder<string, string>(_consumeConf).Build())
             {
                 consumer.Subscribe(topic ?? BaseTopic);
@@ -74,12 +96,8 @@ namespace BuisnesLogic.Service.Clients
                         Task.Delay(TimeSpan.FromSeconds(consuming_time));
                         if (res is not null)
                         {
-                            data = JsonSerializer.Deserialize<TModel>(res.Message.Value);
-                        }
-                        else
-                        {
-                            const string errorMessage = "Data in party is null";
-                            _logger.LogError(DateTime.UtcNow + errorMessage);
+                             data = JsonConvert.DeserializeObject<TModel>(res.Message.Value); 
+                            _logger.LogInformation(DateTime.UtcNow + this.ToString() + " User Added");
                         }
                     }
                     catch (Exception ex)

@@ -10,6 +10,6 @@ namespace BuisnesLogic.ServicesInterface.ClientsInterfaces.MessageBrokers
     public interface IConsumeClient<TModel>
     {
         public ObservableCollection<TModel> Models { get; set; }
-        public void Consume(int consuming_time,CancellationTokenSource cts,string? topic = null);
+        public void Consume(uint consuming_time,CancellationTokenSource cts,string? topic = null);
     }
 }

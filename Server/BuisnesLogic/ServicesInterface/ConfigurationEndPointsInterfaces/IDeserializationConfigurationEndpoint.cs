@@ -1,4 +1,4 @@
-﻿using BuisnesLogic.Models.SerializationModels;
+﻿using BuisnesLogic.Model.DeserializationModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,30 +1,36 @@
-﻿using DomainModel;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+using BuisnesLogic.Model.Roles;
+using DomainModel.Entity;
+using System.Reflection.Metadata;
 namespace DataBase.AppDbContexts
 {
     public class MainDbContext : IdentityDbContext<User, IdentityRole, string>
     {
         public DbSet<Product> Products => Set<Product>();
-        private readonly string? _connectionString;
+        public DbSet<ProductInBucket> AspNetUserProductsInBucket => Set<ProductInBucket>(); 
+        public DbSet<PurchasedProduct> AspNetUserPurchasedProducts => Set<PurchasedProduct>();
         public MainDbContext(DbContextOptions<MainDbContext> opt) : base(opt)
+        //{
+
+        //}
         {
             if (!Database.EnsureCreated())
             {
                 Database.EnsureCreated();
             }
         }
-        public MainDbContext(string connectionstringtest)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            _connectionString = connectionstringtest;
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+                     .HasMany(e => e.ProductsInBucket)
+                     .WithOne(e => e.User)
+                     .HasForeignKey(e => e.ProductId)
+                     .IsRequired();
+                  
         }
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(_connectionString);
-        //}
-
     }
         
 }

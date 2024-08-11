@@ -17,12 +17,12 @@ namespace WebServer
 {
     public class Program
     {
-        // не забудь сделать миграцию
+        // Г­ГҐ Г§Г ГЎГіГ¤Гј Г±Г¤ГҐГ«Г ГІГј Г¬ГЁГЈГ°Г Г¶ГЁГѕ
         public static void Main(string[] args)
         {
           
             var builder = WebApplication.CreateBuilder(args);
-            builder.Configuration.AddPantryStorage("11386f7e-195b-4cfe-9e09-081010a4a279", "PantryStorage");
+            builder.Configuration.AddPantryStorage("", "");
             builder.Services.AddDbContext<MainDbContext>(opt =>
             {
                  opt.UseNpgsql(builder.Configuration["ConnectionStrings:DatabaseConnect"]);
